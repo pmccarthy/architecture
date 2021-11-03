@@ -1,4 +1,4 @@
-# architecture
+# Architecture
 
 The purpose of this repo is to hold architecture documents that relate to overall architecture and design of Kuadrant.
 
