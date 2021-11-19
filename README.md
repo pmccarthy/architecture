@@ -11,3 +11,8 @@ The purpose of this repo is to hold architecture documents that relate to overal
 
 - Specific component level documents that relate to the internal design of a component, these should reside within individual component repos
 - Development process docs for individual components
+
+
+## Technical Discussion and Community meetings
+
+- [Agenda](./meetings/agenda.md)
