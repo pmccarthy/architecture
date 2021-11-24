@@ -6,6 +6,10 @@ Meeting Link: https://meet.google.com/gmw-ddec-dvh
 
 ## Backlog 
 
+- CI/CD for Kuadrant as a whole (at least the CI side for now). 
+    - What do we do now. Are there gaps we would like to address (growing CI CD with the project is important)
+    - suggestion: look at an image that contains and executes our tests (future proofing)
+    - Release process for kuadrant as a whole 
 - OAS flow and API product vs API 
 - Observability for Kuadrant:
   - Available metrics
@@ -18,10 +22,12 @@ Meeting Link: https://meet.google.com/gmw-ddec-dvh
 
 ## 24/11/21
 - Modular installation of Kuadrant   
-- CI/CD for Kuadrant as a whole (at least the CI side for now). 
-    - What do we do now. Are there gaps we would like to address (growing CI CD with the project is important)
-    - suggestion: look at an image that contains and executes our tests (future proofing)
-    - Release process for kuadrant as a whole 
+  - Decision : This will be done via flags to the CLI. In the future it will be handled by the Operator CRD for installation of Kuadarant
+- Module APIs (part 2) 
+  - Proposal to be written on how auth and rate limit will be associated with APIs and how those APIs will form APIProducts (open question on if we still need the APIProduct CR). We want to cover usecases such as:
+    - Supporting unauthenticated Endpoints being specified
+    - Different authentication methods per API
+    - No rate limiting for a particular endpoint 
 
 
 ## 17/11/21
