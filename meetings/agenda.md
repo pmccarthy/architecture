@@ -6,10 +6,7 @@ Meeting Link: https://meet.google.com/gmw-ddec-dvh
 
 ## Backlog 
 
-- CI/CD for Kuadrant as a whole (at least the CI side for now). 
-    - What do we do now. Are there gaps we would like to address (growing CI CD with the project is important)
-    - suggestion: look at an image that contains and executes our tests (future proofing)
-    - Release process for kuadrant as a whole 
+
 - OAS flow and API product vs API 
 - Observability for Kuadrant:
   - Available metrics
@@ -19,6 +16,12 @@ Meeting Link: https://meet.google.com/gmw-ddec-dvh
 - Kuadrant and istio responsibilities
   - should kuadrant expect an installation of istio and so should we be using the istio-system namespace
 
+## 1/12/21
+
+- CI/CD for Kuadrant as a whole (at least the CI side for now). 
+    - What do we do now. Are there gaps we would like to address (growing CI CD with the project is important)
+    - suggestion: look at an image that contains and executes our tests (future proofing)
+    - Release process for kuadrant as a whole 
 
 ## 24/11/21
 - Modular installation of Kuadrant   
