@@ -22,9 +22,6 @@ Meeting Link: https://meet.google.com/gmw-ddec-dvh
     - What do we do now. Are there gaps we would like to address (growing CI CD with the project is important)
     - suggestion: look at an image that contains and executes our tests (future proofing)
     - Release process for kuadrant as a whole 
-- [cbrookes] Backlog and issue tracking
-    - Would like to start builing out a backlog how do we want to do that?
-    - Would also like to start doing some form of backlog refinement / priortisation with the team
   
 
 ## 24/11/21
