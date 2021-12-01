@@ -17,7 +17,7 @@ Meeting Link: https://meet.google.com/gmw-ddec-dvh
   - should kuadrant expect an installation of istio and so should we be using the istio-system namespace
 
 ## 1/12/21
-
+- [cbrookes] 5mins chat this agenda style isnt working :)
 - [cbrookes] CI/CD for Kuadrant as a whole (at least the CI side for now). 
     - What do we do now. Are there gaps we would like to address (growing CI CD with the project is important)
     - suggestion: look at an image that contains and executes our tests (future proofing)
