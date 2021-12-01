@@ -22,6 +22,8 @@ Meeting Link: https://meet.google.com/gmw-ddec-dvh
     - What do we do now. Are there gaps we would like to address (growing CI CD with the project is important)
     - suggestion: look at an image that contains and executes our tests (future proofing)
     - Release process for kuadrant as a whole 
+- [cbrookes]
+   - Next steps with gateway api support
   
 
 ## 24/11/21
