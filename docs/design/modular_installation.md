@@ -2,29 +2,33 @@
 
 Kuadrant is developing a set of loosely coupled functionalities built directly on top of Kubernetes.
 Kuadrant aims to allow customers to just install, use and understand those functionalities they need.
+
+## Problem Statement
+
 Currently, the installation tool of kuadrant, the [kuadrantctl CLI](https://github.com/Kuadrant/kuadrantctl),
-installs all or nothing. For instance, a customer not wanting to rate limit the API,
-should not have to install the rate limit component ([Limitador](https://github.com/Kuadrant/limitador)).
+installs all or nothing. Installing more than the customer needs adds unneeded complexity and operational effort.
+For example, if a customer is looking for rate limiting and not interested in authentication functionality,
+then the customer should be able to just install and run that part of Kuadrant.
 
 ## High Level Goals
 
 * Install only required components. Operate only required components.
-* Expose only the kuadrant API that has available implementation by the with the deployed components
 
-## Installation profiles
+Reduce system complexity and operational effort to the minimum required.
+Components in this context make reference to deployments and running instances.
 
-The kuadrant installation mechanism should offer modular installation to enable pieces of kuadrant.
+* Expose only the activated functionalities
+
+A user of a partial Kuadrant install should not be confronted with data in custom resources that
+has no meaning or is not accessible in their partial Kuadrant install. The design of the kuadrant
+API should have this goal into account.
+
+## Proposed Solution
+
+The kuadrant installation mechanism should offer modular installation to enable/disable loosely coupled pieces of kuadrant.
 Modular installation options should be feature oriented rather than deployment component oriented.
 Then, it is up to the installation tool to decide what components need to be deployed and how to
 configure it.
-
-Kuadrant features:
-
-* Multiple APIs bundled in a product
-* Service Discovery
-* TLS
-* Authentication (mTLS, API key, OIDC)
-* Rate Limiting (pre-auth, post-auth)
 
 Each feature, or part of it, is eligible to be included or excluded when installing kuadrant.
 
@@ -34,30 +38,18 @@ not only can be used to group a set of features, profiles can be used to define 
 
 | Name | Description |
 | ---  | --- |
-| **Minimal** | Minimal installation required to run an API without any protection, analytics or API management |
-| **Authenticated** | MTLS, API key and OIDC authentication features |
+| **Minimal** | Minimal installation required to run an API without any protection, analytics or API management. Default deployment option |
+| **AuthZ** | Authentication and authorization mechanisms activated  |
 | **RateLimit** | Basic rate limit (only pre-auth rate limit) features |
 | **Full** | Full featured kuadrant installation |
-| **Development** | Full featured kuadrant for development purposes. Development deployment mode: debug log level, no cache, tracing |
 
 A kuadrant operator, together with a design of a kuadrant CRD is desired.
 Not only for kuadrant installation, but also for lifecycle management.
 Additionally, the [kuadrantctl](https://github.com/Kuadrant/kuadrantctl) CLI tool can also
-be used to install kuadrant in a profile basis. The CLI tool may also accept, optionally, the kuadrant
-custom resource as input.
+be useful to either deploy kuadrant components and manifests or just deploy the kuadrant operator.
 
-## Available API
-
-The API exposed to the customer is defined in terms of k8s Custom Resource Definitions.
-Kuadrant provides multiple CRDs to configure kuadrant API management.
-Often, a kuadrant feature's fully definition spans multiple CRDs, so the available API cannot be
-accurately defined with a set of CRD. In other words, there is not such a mapping function that maps
-each feature with a CRD.
-
-The [kuadrant-controller](https://github.com/Kuadrant/kuadrant-controller) will be aware of the
-installation profile via env vars (or command line params). With that information,
-the kuadrant controller will reject any configuration object (all the object at once as partial rejection is not supported)
-when that configuration requires something (could be a component or deployment option) from kuadrant
-that is not enabled as part of the installation process.
-
-The customer will be only able to configure available features, nothing more.
+The kuadrant control plane should be aware of the installed profile via env vars or command line params
+in the control plane running components. With that information, the control plane can decide to
+enable or disable CRD watching, label and annotation monitoring and ultimately reject any configuration
+object that relies on disabled functionality. The least a customer can expect from kuadrant is to be
+consistent and reject any functionality request that cannot provide.
