@@ -89,16 +89,17 @@ regarding the Status object definition.
 
 **Conditions**
 
-| Type       | Status | Reason                | Message                                           | Top Level |
-|------------|--------|-----------------------|---------------------------------------------------|-----------|
-| Created    | True   | "PolicyCreated"       | "KuadrantPolicy created"                          | No        |
-| Updated    | True   | "PolicyUpdated"       | "KuadrantPolicy has been updated"                 | No        |
-| Applied    | True   | "PolicyApplied"       | "KuadrantPolicy has been successfully applied     | Yes       |
-|            | False  | "PolicyNotApplied"    | "KuadrantPolicy is invalid"                       |           |
-| Reconciled | True   | "PolicyReconciled"    | "KuadrantPolicy has been successfully reconciled" | Yes       |
-|            | False  | "PolicyNotReconciled" | "KuadrantPolicy failed reconciliation"            |           |
-| Enforced   | True   | "PolicyEnforced"      | "KuadrantPolicy has been successfully enforced"   | Yes       |
-|            | False  | "PolicyNotEnforced"   | "KuadrantPolicy has encountered an error"         |           |
+| Type       | Status | Reason                    | Message                                                                     | Top Level |
+|------------|--------|---------------------------|-----------------------------------------------------------------------------|-----------|
+| Created    | True   | "PolicyCreated"           | "KuadrantPolicy created"                                                    | No        |
+| Updated    | True   | "PolicyUpdated"           | "KuadrantPolicy has been updated"                                           | No        |
+| Applied    | True   | "PolicyApplied"           | "KuadrantPolicy has been successfully applied                               | Yes       |
+|            | False  | "PolicyNotApplied"        | "KuadrantPolicy is invalid"                                                 |           |
+| Reconciled | True   | "PolicyReconciled"        | "KuadrantPolicy has been successfully reconciled"                           | Yes       |
+|            | False  | "PolicyNotReconciled"     | "KuadrantPolicy failed reconciliation"                                      |           |
+| Enforced   | True   | "PolicyEnforced"          | "KuadrantPolicy has been successfully enforced"                             | Yes       |
+|            | False  | "PolicyPartiallyEnforced" | "KuadrantPolicy has encountered some issues and has been partially applied" |           |
+|            | False  | "PolicyNotEnforced"       | "KuadrantPolicy has encountered an error and can't be applied"              |           |
 
 
 A simplified version and more aligned with the Kubernetes objects implementation could be represented as the following.
@@ -107,20 +108,21 @@ A simplified version and more aligned with the Kubernetes objects implementation
 
 All conditions are top-level.
 
-| Type        | Status | Reason                      | Message                                                   |
-|-------------|--------|-----------------------------|-----------------------------------------------------------|
-| Progressing | True   | "PolicyCreated"             | "KuadrantPolicy created"                                  |
-|             | True   | "PolicyUpdated"             | "KuadrantPolicy has been updated"                         |
-|             | True   | "PolicyApplied"             | "KuadrantPolicy has been successfully applied             |
-|             | True   | "PolicyReconciled"          | "KuadrantPolicy has been successfully reconciled"         |
-|             | False  | "PolicyEnforced"            | "KuadrantPolicy has been successfully enforced"           |
-|             | False  | "PolicyError"               | "KuadrantPolicy has encountered an error"                 |
-| Enforced    | True   | "PolicyEnforced"            | "KuadrantPolicy has been successfully enforced"           |
-|             | False  | "PolicyNotEnforced"         | "KuadrantPolicy has encountered an error while enforcing" |
-| Failed      | True   | "PolicyValidationError"     | "KuadrantPolicy has failed to validate"                   |
-|             | True   | "PolicyReconciliationError" | "KuadrantPolicy has encountered a reconciliation error"   |
-|             | True   | "PolicyServiceError"        | "KuadrantPolicy has encountered has failed to enforce"    |
-|             | False  | "PolicyEnforced"            | "KuadrantPolicy has been successfully enforced"           |
+| Type        | Status | Reason                      | Message                                                                     |
+|-------------|--------|-----------------------------|-----------------------------------------------------------------------------|
+| Progressing | True   | "PolicyCreated"             | "KuadrantPolicy created"                                                    |
+|             | True   | "PolicyUpdated"             | "KuadrantPolicy has been updated"                                           |
+|             | True   | "PolicyApplied"             | "KuadrantPolicy has been successfully applied                               |
+|             | True   | "PolicyReconciled"          | "KuadrantPolicy has been successfully reconciled"                           |
+|             | False  | "PolicyEnforced"            | "KuadrantPolicy has been successfully enforced"                             |
+|             | False  | "PolicyError"               | "KuadrantPolicy has encountered an error"                                   |
+| Enforced    | True   | "PolicyEnforced"            | "KuadrantPolicy has been successfully enforced"                             |
+|             | False  | "PolicyPartiallyEnforced"   | "KuadrantPolicy has encountered some issues and has been partially applied" |
+|             | False  | "PolicyNotEnforced"         | "KuadrantPolicy has encountered an error and can't be applied"              |
+| Failed      | True   | "PolicyValidationError"     | "KuadrantPolicy has failed to validate"                                     |
+|             | True   | "PolicyReconciliationError" | "KuadrantPolicy has encountered a reconciliation error"                     |
+|             | True   | "PolicyServiceError"        | "KuadrantPolicy has encountered has failed to enforce"                      |
+|             | False  | "PolicyEnforced"            | "KuadrantPolicy has been successfully enforced"                             |
 
 
 ### Notes
