@@ -83,6 +83,7 @@ This is the final top-level condition.
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
 
+## Option 1
 The stages before mentioned, will follow the [Kubernetes guidelines](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties) 
 regarding the Status object definition.
 
@@ -102,6 +103,7 @@ regarding the Status object definition.
 |            | False  | "PolicyNotEnforced"       | "KuadrantPolicy has encountered an error and can't be applied"              |           |
 
 
+## Option 2
 A simplified version and more aligned with the Kubernetes objects implementation could be represented as the following.
 
 **Conditions**
@@ -118,11 +120,31 @@ All conditions are top-level.
 |             | False  | "PolicyError"               | "KuadrantPolicy has encountered an error"                                   |
 | Enforced    | True   | "PolicyEnforced"            | "KuadrantPolicy has been successfully enforced"                             |
 |             | False  | "PolicyPartiallyEnforced"   | "KuadrantPolicy has encountered some issues and has been partially applied" |
-|             | False  | "PolicyNotEnforced"         | "KuadrantPolicy has encountered an error and can't be applied"              |
+|             | False  | "PolicyOverridden"          | "KuadrantPolicy is overridden by [policy-ns/policy-name]"                   |
 | Failed      | True   | "PolicyValidationError"     | "KuadrantPolicy has failed to validate"                                     |
-|             | True   | "PolicyReconciliationError" | "KuadrantPolicy has encountered a reconciliation error"                     |
 |             | True   | "PolicyServiceError"        | "KuadrantPolicy has encountered has failed to enforce"                      |
 |             | False  | "PolicyEnforced"            | "KuadrantPolicy has been successfully enforced"                             |
+
+
+## Option 3
+A simpler third option would align more with [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/#conditions). In this case,
+besides the proposed `Accepted` _PolicyType_, the `Enforced` _PolicyType_ would be added to reflect the final state of the policy,
+which means that the policy is showing the synced actual state of the Kuadrant services. The missing `Failed` _PolicyType_
+would be implicitly represented by the `TargetNotFound` and `Invalid` _PolicyTypeReason_.
+
+**Conditions**
+
+All conditions are top-level.
+
+| Type     | Status | Reason               | Message                                                                     |
+|----------|--------|----------------------|-----------------------------------------------------------------------------|
+| Accepted | True   | "Accepted"           | "KuadrantPolicy has been accepted"                                          |
+|          | False  | "Conflicted"         | "KuadrantPolicy is conflicted by [policy-ns/policy-name], ..."              |
+|          | False  | "Invalid"            | "KuadrantPolicy is invalid"                                                 |
+|          | False  | "TargetNotFound"     | "KuadrantPolicy target [resource-name] was not found"                       |
+| Enforced | True   | "Enforced"           | "KuadrantPolicy has been successfully enforced"                             |
+|          | False  | "PartiallyEnforced"  | "KuadrantPolicy has encountered some issues and has been partially applied" |
+|          | False  | "Overridden"         | "KuadrantPolicy is overridden by [policy-ns/policy-name], ..."              |
 
 
 ### Notes
