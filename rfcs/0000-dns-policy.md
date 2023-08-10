@@ -2,8 +2,8 @@
 
 - Feature Name: DNSPolicy
 - Start Date: 2023-07-01
-- RFC PR: [Kuadrant/architecture#0000](https://github.com/Kuadrant/architecture/pull/0000)
-- Issue tracking: [Kuadrant/architecture#0000](https://github.com/Kuadrant/architecture/issues/0000)
+- RFC PR: [Kuadrant/architecture#20](https://github.com/Kuadrant/architecture/pull/20)
+- Issue tracking: [Kuadrant/architecture#0000](https://github.com/Kuadrant/multicluster-gateway-controller/issues/219)
 - Labels: DNS, Load Balancing, Multi-Cluster
     
 
@@ -23,16 +23,12 @@ Ideally we would allow them to express a strategy that they want to use without 
 
 Allow definition of a DNSPolicy that configures load balancing to decide how traffic should be distributed across multiple gateway instances from the central control plane.
 
-# Reference-level explanation
-[reference-level-explanation]: #reference-level-explanation
-
 ## Terms
 
 - **managed listener**: This is a listener with a host backed by a DNS zone managed by the multi-cluster gateway controller
 - **hub cluster**: control plane cluster that managed 1 or more spokes
 - **spoke cluster**: a cluster managed by the hub control plane cluster. This is where gateway are instantiated
 
-## Proposal
 
 Provide a control plane DNSPolicy API that uses the idea of direct [policy attachment](https://gateway-api.sigs.k8s.io/references/policy-attachment/#direct-policy-attachment) from gateway API that allows a load balancing strategy to be applied to the DNS records structure for any managed listeners being served by the data plane instances of this gateway. 
 The DNSPolicy also covers health checks that inform the DNS response but that is not covered in this document.
@@ -234,6 +230,14 @@ spec:
       defaultGeo: IE
 ``` 
 
+
+# Reference-level explanation
+[reference-level-explanation]: #reference-level-explanation
+
+- Add a DNSPolicy CRD that conforms to policy attachment spec
+- Add a new DNSPolicy controller to MCG
+- DNS logic and record management should all migrate out of the gateway controller into this new DNSPolicy controller as it is the responsibility and domain of the DNSPolicy controller to manage DNS
+- remove the Hosts interface as we want do not want other controllers using this to bring DNS Logic into other areas of the code.
 
 # Drawbacks
 [drawbacks]: #drawbacks
