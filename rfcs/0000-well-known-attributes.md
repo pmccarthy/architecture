@@ -547,11 +547,13 @@ Another experience learned from Authorino's Authorization JSON selectors is that
 # Unresolved questions
 [unresolved-questions]: #unresolved-questions
 
-1. Can we make more attributes that are currently available to only one of the components common to both?
+1. How to deal with the differences regarding the availability and data types of the attributes across clients/hosts?
 
-2. Will we need some kind of global support for modifiers (functions) in the well-known selectors or those can continue to be an Authorino-only feature?
+2. Can we make more attributes that are currently available to only one of the components common to both?
 
-3. Does Authorino, which is more strict regarding the data structure that induces the selectors, need to implement this specification or could/should it keep its current selectors and a translation be performed by the AuthPolicy controller?
+3. Will we need some kind of global support for modifiers (functions) in the well-known selectors or those can continue to be an Authorino-only feature?
+
+4. Does Authorino, which is more strict regarding the data structure that induces the selectors, need to implement this specification or could/should it keep its current selectors and a translation be performed by the AuthPolicy controller?
 
 # Future possibilities
 [future-possibilities]: #future-possibilities
