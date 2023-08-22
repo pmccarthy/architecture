@@ -79,8 +79,6 @@ The next sections specify the well-known attributes organized in the following g
 - [Metadata and filter state attributes](#metadata-and-filter-state-attributes)
 - [Auth attributes](#auth-attributes)
 - [Rate-limit attributes](#rate-limit-attributes)
-- [Wasm attributes](#wasm-attributes)
-- [Proxy configuration attributes](#proxy-configuration-attributes)
 
 ## Request attributes
 
@@ -517,161 +515,6 @@ The following attributes are exclusive of the rate-limiting service (Limitador).
   </tbody>
 </table>
 
-## Wasm attributes
-
-The following are attributes only available to Wasm extensions. They were all prefixed with `wasm.` compared to how defined in the [Envoy attributes](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/advanced/attributes#wasm-attributes), to provide a better namespace.
-
-<table>
-  <thead>
-    <tr>
-      <th><p>Attribute</p></th>
-      <th><p>Type</p></th>
-      <th><p>Description</p></th>
-      <th><p>Auth</p></th>
-      <th><p>RL</p></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><p>wasm.plugin_name</p></td>
-      <td><p>String</p></td>
-      <td><p>Plugin name</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>wasm.plugin_root_id</p></td>
-      <td><p>String</p></td>
-      <td><p>Plugin root ID</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>wasm.plugin_vm_id</p></td>
-      <td><p>String</p></td>
-      <td><p>Plugin VM ID</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>wasm.node</p></td>
-      <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-node"><span>Node</span></a></p></td>
-      <td><p>Local node description</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>wasm.cluster_name</p></td>
-      <td><p>String</p></td>
-      <td><p>Upstream cluster name</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>wasm.cluster_metadata</p></td>
-      <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
-      <td><p>Upstream cluster metadata</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>wasm.listener_direction</p></td>
-      <td><p>Number</p></td>
-      <td><p>Enumeration value of the <a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener.proto#envoy-v3-api-field-config-listener-v3-listener-traffic-direction"><span>listener traffic direction</span></a></p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>wasm.listener_metadata</p></td>
-      <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
-      <td><p>Listener metadata</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>wasm.route_name</p></td>
-      <td><p>String</p></td>
-      <td><p>Route name</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>wasm.route_metadata</p></td>
-      <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
-      <td><p>Route metadata</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>wasm.upstream_host_metadata</p></td>
-      <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
-      <td><p>Upstream host metadata</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-  </tbody>
-</table>
-
-## Proxy configuration attributes
-
-_(These attributes need confirmation if they are all actually available to be requested by the Wasm-shim.)_
-
-<table>
-  <thead>
-    <tr>
-      <th><p>Attribute</p></th>
-      <th><p>Type</p></th>
-      <th><p>Description</p></th>
-      <th><p>Auth</p></th>
-      <th><p>RL</p></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><p>xds.cluster_name</p></td>
-      <td><p>String</p></td>
-      <td><p>Upstream cluster name</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>xds.cluster_metadata</p></td>
-      <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
-      <td><p>Upstream cluster metadata</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>xds.route_name</p></td>
-      <td><p>String</p></td>
-      <td><p>Route name</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>xds.route_metadata</p></td>
-      <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
-      <td><p>Route metadata</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>xds.upstream_host_metadata</p></td>
-      <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
-      <td><p>Upstream host metadata</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-    <tr>
-      <td><p>xds.filter_chain_name</p></td>
-      <td><p>String</p></td>
-      <td><p>Listener filter chain name</p></td>
-      <td align="center"><p></p></td>
-      <td align="center"><p>✓</p></td>
-    </tr>
-  </tbody>
-</table>
-
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -704,13 +547,11 @@ Another experience learned from Authorino's Authorization JSON selectors is that
 # Unresolved questions
 [unresolved-questions]: #unresolved-questions
 
-1. Are all attributes in the [proxy configuration](#proxy-configuration-attributes) group available for the wasm-shim or some of the attributes are resolved in subsequent phases?
+1. Can we make more attributes that are currently available to only one of the components common to both?
 
-2. Can we make more attributes that are currently available to only one of the components common to both?
+2. Will we need some kind of global support for modifiers (functions) in the well-known selectors or those can continue to be an Authorino-only feature?
 
-3. Will we need some kind of global support for modifiers (functions) in the well-known selectors or those can continue to be an Authorino-only feature?
-
-4. Does Authorino, which is more strict regarding the data structure that induces the selectors, need to implement this specification or could/should it keep its current selectors and a translation be performed by the AuthPolicy controller?
+3. Does Authorino, which is more strict regarding the data structure that induces the selectors, need to implement this specification or could/should it keep its current selectors and a translation be performed by the AuthPolicy controller?
 
 # Future possibilities
 [future-possibilities]: #future-possibilities
@@ -722,4 +563,161 @@ Another experience learned from Authorino's Authorization JSON selectors is that
    - `request.param.my-param`
    - `connection.secure`
 
-2. Add some support for value modifiers (functions), along the lines of Authorino's [JSON path modifiers](https://github.com/Kuadrant/authorino/blob/main/docs/features.md#string-modifiers) and/or Envoy attributes' [path expressions](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/advanced/attributes#path-expressions).
+2. Other Envoy attributes
+
+<details>
+  <summary><a href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/advanced/attributes#wasm-attributes">Wasm attributes</a></summary>
+
+  <table>
+    <thead>
+      <tr>
+        <th><p>Attribute</p></th>
+        <th><p>Type</p></th>
+        <th><p>Description</p></th>
+        <th><p>Auth</p></th>
+        <th><p>RL</p></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><p>wasm.plugin_name</p></td>
+        <td><p>String</p></td>
+        <td><p>Plugin name</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>wasm.plugin_root_id</p></td>
+        <td><p>String</p></td>
+        <td><p>Plugin root ID</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>wasm.plugin_vm_id</p></td>
+        <td><p>String</p></td>
+        <td><p>Plugin VM ID</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>wasm.node</p></td>
+        <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-node"><span>Node</span></a></p></td>
+        <td><p>Local node description</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>wasm.cluster_name</p></td>
+        <td><p>String</p></td>
+        <td><p>Upstream cluster name</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>wasm.cluster_metadata</p></td>
+        <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
+        <td><p>Upstream cluster metadata</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>wasm.listener_direction</p></td>
+        <td><p>Number</p></td>
+        <td><p>Enumeration value of the <a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener.proto#envoy-v3-api-field-config-listener-v3-listener-traffic-direction"><span>listener traffic direction</span></a></p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>wasm.listener_metadata</p></td>
+        <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
+        <td><p>Listener metadata</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>wasm.route_name</p></td>
+        <td><p>String</p></td>
+        <td><p>Route name</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>wasm.route_metadata</p></td>
+        <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
+        <td><p>Route metadata</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>wasm.upstream_host_metadata</p></td>
+        <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
+        <td><p>Upstream host metadata</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+    </tbody>
+  </table>
+</details>
+
+<details>
+  <summary><a href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/advanced/attributes#configuration-attributes">Proxy configuration attributes</a></summary>
+
+  <table>
+    <thead>
+      <tr>
+        <th><p>Attribute</p></th>
+        <th><p>Type</p></th>
+        <th><p>Description</p></th>
+        <th><p>Auth</p></th>
+        <th><p>RL</p></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><p>xds.cluster_name</p></td>
+        <td><p>String</p></td>
+        <td><p>Upstream cluster name</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>xds.cluster_metadata</p></td>
+        <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
+        <td><p>Upstream cluster metadata</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>xds.route_name</p></td>
+        <td><p>String</p></td>
+        <td><p>Route name</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>xds.route_metadata</p></td>
+        <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
+        <td><p>Route metadata</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>xds.upstream_host_metadata</p></td>
+        <td><p><a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-metadata">Metadata</a></p></td>
+        <td><p>Upstream host metadata</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+      <tr>
+        <td><p>xds.filter_chain_name</p></td>
+        <td><p>String</p></td>
+        <td><p>Listener filter chain name</p></td>
+        <td align="center"><p></p></td>
+        <td align="center"><p>✓</p></td>
+      </tr>
+    </tbody>
+  </table>
+</details>
+
+3. Add some support for value modifiers (functions), along the lines of Authorino's [JSON path modifiers](https://github.com/Kuadrant/authorino/blob/main/docs/features.md#string-modifiers) and/or Envoy attributes' [path expressions](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/advanced/attributes#path-expressions).
