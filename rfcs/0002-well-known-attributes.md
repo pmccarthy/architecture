@@ -2,8 +2,7 @@
 
 - Feature Name: `well-known-attributes`
 - Start Date: 2023-06-13
-- RFC PR: [Kuadrant/architecture#0000](https://github.com/Kuadrant/architecture/pull/0000)
-- Issue tracking: [Kuadrant/architecture#0000](https://github.com/Kuadrant/architecture/issues/0000)
+- RFC PR: [Kuadrant/architecture#17](https://github.com/Kuadrant/architecture/pull/17)
 
 # Summary
 [summary]: #summary
