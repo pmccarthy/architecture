@@ -28,11 +28,13 @@ The following are some issues addressing the before mentioned drawbacks:
 # Guide-level explanation
 [guide-level-explanation]: #guide-level-explanation
 
-The following proposal it's divided in 3 stages, where each one could be applied/develop in order and would reflect valuable
+The following proposal presents 2 options and are divided in 2 or 3 stages, where each one could be applied/develop in order and would reflect valuable
 and accurate information with different degrees of acuity. The Policy CRD Status in the following diagrams, are simplified
 as states, which in the [Reference-level explanation](#reference-level-explanation) will be translated to the actual Status Conditions.
 
-## Stage 1
+## Option 1
+
+### Stage 1
 **The state is defined by the application and validation of the Policy CR**
 
 This first stage is a simple version where the operator only relies on itself, not checking the healthiness of its services
@@ -48,7 +50,7 @@ States rationale:
 state or a top-level condition.
 * `Updated`: From `Failed` or `Applied`, it could be triggered a `Spec Change` event that will move it to this state.
 
-## Stage 2
+### Stage 2
 **A further reconciliation check provides a new state**
 
 This following one, besides checking what the former stage does, it also adds the states reflecting the reconciliation
@@ -64,7 +66,7 @@ States rationale:
 * `Reconciled`: It communicates that the policy has successfully being reconciled, and any K8s object or required CR has been updated.
 * `Failed`: This one will be reached when either of `Validation` and `Reconcilation` processes have encounter any errors.
 
-## Stage 3
+### Stage 3
 **A final health check of services refines the status**
 
 The final stage will bring a greater degree of accuracy, thanks for a final process that will check the healthiness and 
@@ -80,31 +82,38 @@ This is the final top-level condition.
 * `Failed`: Now this state could also be set after encountering errors in the `Service Probe` check.
 
 
+## Option 2
+
+### Stage 1
+**In this case, the state is not only defined by the application and validation of the Policy CR, but also by the reconciliation of it**
+
+States rationale:
+
+* `Accepted`: This state is reached after the `Validation` and `Reconciliation` event has being successfully passed.
+* `Invalid`: When the `Validation` process encounters an error, this state will be set.
+* `TargetNotFound`: This state will be set when the `Reconciliation` process encounters an error.
+* `Conflicted`: This state will be set when the `Reconciliation` process encounters an error.
+
+![](0000-rlp-status-assets/rlp_status_4.png)
+
+Notes:
+* In this phase, it could also implement the states from the Stage 2, but only relying on _Validation_ and _Reconciliation_ events.
+
+### Stage 2
+**The `Enforced` type is introduced and a health check of services sets the final status**
+
+* `Enforced`: After a successful response of the `Service Probe`, this states communicates the policy is finally enforced.
+* `PartiallyEnforced`: This state will be set when the `Reconciliation` event encounters an overlap with other policies.
+* `Overridden`: This state will be set when the `Reconciliation` event invalidates the policy because another one takes precedence.
+
+![](0000-rlp-status-assets/rlp_status_5.png)
+
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
 
 ## Option 1
-The stages before mentioned, will follow the [Kubernetes guidelines](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties) 
+The stages before mentioned, will follow the [Kubernetes guidelines](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties)
 regarding the Status object definition.
-
-
-**Conditions**
-
-| Type       | Status | Reason                    | Message                                                                     | Top Level |
-|------------|--------|---------------------------|-----------------------------------------------------------------------------|-----------|
-| Created    | True   | "PolicyCreated"           | "KuadrantPolicy created"                                                    | No        |
-| Updated    | True   | "PolicyUpdated"           | "KuadrantPolicy has been updated"                                           | No        |
-| Applied    | True   | "PolicyApplied"           | "KuadrantPolicy has been successfully applied                               | Yes       |
-|            | False  | "PolicyNotApplied"        | "KuadrantPolicy is invalid"                                                 |           |
-| Reconciled | True   | "PolicyReconciled"        | "KuadrantPolicy has been successfully reconciled"                           | Yes       |
-|            | False  | "PolicyNotReconciled"     | "KuadrantPolicy failed reconciliation"                                      |           |
-| Enforced   | True   | "PolicyEnforced"          | "KuadrantPolicy has been successfully enforced"                             | Yes       |
-|            | False  | "PolicyPartiallyEnforced" | "KuadrantPolicy has encountered some issues and has been partially applied" |           |
-|            | False  | "PolicyNotEnforced"       | "KuadrantPolicy has encountered an error and can't be applied"              |           |
-
-
-## Option 2
-A simplified version and more aligned with the Kubernetes objects implementation could be represented as the following.
 
 **Conditions**
 
@@ -126,8 +135,8 @@ All conditions are top-level.
 |             | False  | "PolicyEnforced"            | "KuadrantPolicy has been successfully enforced"                             |
 
 
-## Option 3
-A simpler third option would align more with [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/#conditions). In this case,
+## Option 2
+A simpler second option would align more with [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/#conditions). In this case,
 besides the proposed `Accepted` _PolicyType_, the `Enforced` _PolicyType_ would be added to reflect the final state of the policy,
 which means that the policy is showing the synced actual state of the Kuadrant services. The missing `Failed` _PolicyType_
 would be implicitly represented by the `TargetNotFound` and `Invalid` _PolicyTypeReason_.
@@ -151,6 +160,10 @@ All conditions are top-level.
 * The messages, the ones corresponding to the _falsey status_, might reflect the error that encountered.
 * It's possible to have the _Failed_ state as a top level condition too. In this case might be useful to add a third 
 "Unknown" status.
+* The implementation of this option, could be phased in 2 stages, being _"Accepted"_ type implemented first,
+followed by the _"Enforced"_ type. This particular order can be explained by considering the lack of service reporting,
+without proper reporting mechanisms in place from the Kuadrant services, it might be challenging to report the
+_Enforced_ status type immediately. However, it could be done only relying on Reconciliation events.
 
 # Drawbacks
 [drawbacks]: #drawbacks
