@@ -145,15 +145,17 @@ would be implicitly represented by the `TargetNotFound` and `Invalid` _PolicyTyp
 
 All conditions are top-level.
 
-| Type     | Status | Reason               | Message                                                                     |
-|----------|--------|----------------------|-----------------------------------------------------------------------------|
-| Accepted | True   | "Accepted"           | "KuadrantPolicy has been accepted"                                          |
-|          | False  | "Conflicted"         | "KuadrantPolicy is conflicted by [policy-ns/policy-name], ..."              |
-|          | False  | "Invalid"            | "KuadrantPolicy is invalid"                                                 |
-|          | False  | "TargetNotFound"     | "KuadrantPolicy target [resource-name] was not found"                       |
-| Enforced | True   | "Enforced"           | "KuadrantPolicy has been successfully enforced"                             |
-|          | False  | "PartiallyEnforced"  | "KuadrantPolicy has encountered some issues and has been partially applied" |
-|          | False  | "Overridden"         | "KuadrantPolicy is overridden by [policy-ns/policy-name], ..."              |
+| Type           | Status | Reason              | Message                                                                     |
+|----------------|--------|---------------------|-----------------------------------------------------------------------------|
+| Accepted       | True   | "Accepted"          | "KuadrantPolicy has been accepted"                                          |
+|                | False  | "Conflicted"        | "KuadrantPolicy is conflicted by [policy-ns/policy-name], ..."              |
+|                | False  | "Invalid"           | "KuadrantPolicy is invalid"                                                 |
+|                | False  | "TargetNotFound"    | "KuadrantPolicy target [resource-name] was not found"                       |
+| Enforced       | True   | "Enforced"          | "KuadrantPolicy has been successfully enforced"                             |
+|                | False  | "PartiallyEnforced" | "KuadrantPolicy has encountered some issues and has been partially applied" |
+|                | False  | "Overridden"        | "KuadrantPolicy is overridden by [policy-ns/policy-name], ..."              |
+| PolicyAffected | True   | "PolicyAffected"    | "KuadrantPolicy is affected by [policy-ns/policy-name], ..."                |
+|                | False  | "PolicyNotAffected" | "KuadrantPolicy is not affected"                                            |
 
 
 ### Notes
@@ -164,6 +166,8 @@ All conditions are top-level.
 followed by the _"Enforced"_ type. This particular order can be explained by considering the lack of service reporting,
 without proper reporting mechanisms in place from the Kuadrant services, it might be challenging to report the
 _Enforced_ status type immediately. However, it could be done only relying on Reconciliation events.
+* This option WILL include the Gateway API upstream [PolicyAncestorStatus](https://github.com/youngnick/gateway-api/blob/main/geps/gep-713.md#standard-status-struct)
+in order to help with broader consistency and discoverability of the policy precedence.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -171,6 +175,8 @@ _Enforced_ status type immediately. However, it could be done only relying on Re
 - This proposal will require to change the code controllers assert the status
 - Since the Status is part of the "API", won't be backwards compatible
 - Documentation updating
+- The implementation of the affected policies will create a _fan-out_ problem, that might lead to updating many policy
+objects and apiserver load.
 
 # Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
