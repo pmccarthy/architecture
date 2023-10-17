@@ -2,8 +2,8 @@
 
 - Feature Name: `single-cluster-dnspolicy`
 - Start Date: 2023-10-09
-- RFC PR: [Kuadrant/architecture#0000](https://github.com/Kuadrant/architecture/pull/0000)
-- Issue tracking: [Kuadrant/architecture#0000](https://github.com/Kuadrant/architecture/issues/0000)
+- RFC PR: [Kuadrant/architecture#30](https://github.com/Kuadrant/architecture/pull/30)
+- Issue tracking: [Kuadrant/architecture#31](https://github.com/Kuadrant/architecture/issues/31)
 
 # Summary
 [summary]: #summary
