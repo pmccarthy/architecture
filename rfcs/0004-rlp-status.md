@@ -44,7 +44,7 @@ as states, which in the [Reference-level explanation](#reference-level-explanati
 This first stage is a simple version where the operator only relies on itself, not checking the healthiness of its services
 and just validating the Spec.
 
-![](0000-rlp-status-assets/rlp_status_1.png)
+![](0004-rlp-status-assets/rlp_status_1.png)
 
 States rationale:
 
@@ -62,7 +62,7 @@ process of any needed Kubernets object, Kuadrant Services custom resources and a
 An example would be in the case of the RLP, it will create/update the `ConfigMap` holding the `Limitador` config file.
 
 
-   ![](0000-rlp-status-assets/rlp_status_2.png)
+   ![](0004-rlp-status-assets/rlp_status_2.png)
 
 States rationale:
 
@@ -76,7 +76,7 @@ States rationale:
 The final stage will bring a greater degree of accuracy, thanks for a final process that will check the healthiness and 
 configuration version the Kuadrant services currently enforces.
 
-   ![](0000-rlp-status-assets/rlp_status_3.png)
+   ![](0004-rlp-status-assets/rlp_status_3.png)
 
 States rationale:
 
@@ -98,7 +98,7 @@ States rationale:
 * `TargetNotFound`: This state will be set when the `Reconciliation` process encounters an error.
 * `Conflicted`: This state will be set when the `Reconciliation` process encounters an error.
 
-![](0000-rlp-status-assets/rlp_status_4.png)
+![](0004-rlp-status-assets/rlp_status_4.png)
 
 Notes:
 * In this phase, it could also implement the states from the Stage 2, but only relying on _Validation_ and _Reconciliation_ events.
@@ -110,7 +110,7 @@ Notes:
 * `PartiallyEnforced`: This state will be set when the `Reconciliation` event encounters an overlap with other policies.
 * `Overridden`: This state will be set when the `Reconciliation` event invalidates the policy because another one takes precedence.
 
-![](0000-rlp-status-assets/rlp_status_5.png)
+![](0004-rlp-status-assets/rlp_status_5.png)
 
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
