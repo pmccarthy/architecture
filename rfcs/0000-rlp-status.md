@@ -10,6 +10,10 @@
 
 This RFC proposes a new design for any Kuadrant Policy (`RateLimitPolicy`, `AuthPolicy`, etc..) Status definition and transitions.
 
+__The chosen option is [number 2](#option-2), which can be split in 2 stages, or directly implemented as a whole.__
+[Option 1](#option-1), while is a valid option, it doesn't align with [GEP-713](https://github.com/youngnick/gateway-api/blob/main/geps/gep-713.md),
+and it's not as flexible as the second one.
+
 # Motivation
 [motivation]: #motivation
 
