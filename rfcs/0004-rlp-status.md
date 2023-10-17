@@ -149,17 +149,17 @@ would be implicitly represented by the `TargetNotFound` and `Invalid` _PolicyTyp
 
 All conditions are top-level.
 
-| Type           | Status | Reason              | Message                                                                     |
-|----------------|--------|---------------------|-----------------------------------------------------------------------------|
-| Accepted       | True   | "Accepted"          | "KuadrantPolicy has been accepted"                                          |
-|                | False  | "Conflicted"        | "KuadrantPolicy is conflicted by [policy-ns/policy-name], ..."              |
-|                | False  | "Invalid"           | "KuadrantPolicy is invalid"                                                 |
-|                | False  | "TargetNotFound"    | "KuadrantPolicy target [resource-name] was not found"                       |
-| Enforced       | True   | "Enforced"          | "KuadrantPolicy has been successfully enforced"                             |
-|                | False  | "PartiallyEnforced" | "KuadrantPolicy has encountered some issues and has been partially applied" |
-|                | False  | "Overridden"        | "KuadrantPolicy is overridden by [policy-ns/policy-name], ..."              |
-| PolicyAffected | True   | "PolicyAffected"    | "KuadrantPolicy is affected by [policy-ns/policy-name], ..."                |
-|                | False  | "PolicyNotAffected" | "KuadrantPolicy is not affected"                                            |
+| Type           | Status | Reason              | Message                                                        |
+|----------------|--------|---------------------|----------------------------------------------------------------|
+| Accepted       | True   | "Accepted"          | "KuadrantPolicy has been accepted"                             |
+|                | False  | "Conflicted"        | "KuadrantPolicy is conflicted by [policy-ns/policy-name], ..." |
+|                | False  | "Invalid"           | "KuadrantPolicy is invalid"                                    |
+|                | False  | "TargetNotFound"    | "KuadrantPolicy target [resource-name] was not found"          |
+| Enforced       | True   | "Enforced"          | "KuadrantPolicy has been successfully enforced"                |
+|                | False  | "Unknown"           | "KuadrantPolicy has encountered some issues"                   |
+|                | False  | "Overridden"        | "KuadrantPolicy is overridden by [policy-ns/policy-name], ..." |
+| PolicyAffected | True   | "PolicyAffected"    | "KuadrantPolicy is affected by [policy-ns/policy-name], ..."   |
+|                | False  | "PolicyNotAffected" | "KuadrantPolicy is not affected"                               |
 
 
 ### Notes
