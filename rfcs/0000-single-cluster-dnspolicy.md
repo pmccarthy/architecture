@@ -8,7 +8,7 @@
 # Summary
 [summary]: #summary
 
-Proposal for changes to the `DNSPolicy` API to allow it to provide a simple dns strategy as an option in a single cluster context. This will remove, but not negate, the complex DNS structure we use in a multi-cluster environment and in doing so allow use of popular dns integrators such as external-dns .
+Proposal for changes to the `DNSPolicy` API to allow it to provide a simple routing strategy as an option in a single cluster context. This will remove, but not negate, the complex DNS structure we use in a multi-cluster environment and in doing so allow use of popular dns integrators such as external-dns .
 
 # Motivation
 [motivation]: #motivation
@@ -23,9 +23,9 @@ The [`DNSPolicy`](https://github.com/Kuadrant/multicluster-gateway-controller/bl
 [guide-level-explanation]: #guide-level-explanation
 
 The DNSPolicy can be used to target a Gateway in a single cluster context and will create dns records for each listener host in an appropriately configured external dns provider.
-In this context the advanced `loadbalancing` configuration is unnecessary, and the resulting DNSRecord can be created mapping individual listener hosts to a single DNS A or CNAME record by using the `simple` strategy in the DNSPolicy.
+In this context the advanced `loadbalancing` configuration is unnecessary, and the resulting DNSRecord can be created mapping individual listener hosts to a single DNS A or CNAME record by using the `simple` routing strategy in the DNSPolicy.
 
-**Example 1.** DNSPolicy using `simple` strategy
+**Example 1.** DNSPolicy using `simple` routing strategy
 
 ```yaml
 apiVersion: kuadrant.io/v1alpha1
@@ -42,7 +42,7 @@ spec:
     name: prod-web
     group: gateway.networking.k8s.io
     kind: Gateway
-  strategy: simple
+  routingStrategy: simple
 ```
 
 ```yaml
@@ -68,7 +68,7 @@ status:
 ```
 
 In the example the `api` listener has a hostname `myapp.mn.hcpapps.net` that matches a hosted zone being managed by the provider referenced `my-route53-credentials` in the DNSPolicy. 
-As the `simple` strategy is set in the DNSPolicy a DNSRecord resource with the following contents will be created:
+As the `simple` routing strategy is set in the DNSPolicy a DNSRecord resource with the following contents will be created:
 
 ```yaml
 apiVersion: kuadrant.io/v1alpha1
@@ -88,9 +88,9 @@ spec:
         - 172.31.200.0
 ```
 
-The `providerRef` is included in the DNSRecord to allow the MGC dns record controller to load the appropriate provider configuration during reconciliation and create the DNS records in the dns provider service e.g. route 53, by default the provider `Kind` is a secret.
+The `providerRef` is included in the DNSRecord to allow the dns record controller to load the appropriate provider configuration during reconciliation and create the DNS records in the dns provider service e.g. route 53, by default the provider `Kind` is a secret.
 
-**Example 2.** DNSPolicy using `simple` strategy with external dns provider
+**Example 2.** DNSPolicy using `simple` routing strategy with external dns provider
 
 ```yaml
 apiVersion: kuadrant.io/v1alpha1
@@ -106,10 +106,76 @@ spec:
     name: prod-web
     group: gateway.networking.k8s.io
     kind: Gateway
-  strategy: simple
+  routingStrategy: simple
 ```
 
-In ths example if the DNSPolicy was attached to the same gateway described in example 1, the same DNSRecord would also be created but MGC would not reconcile it. In this scenario it is expected that an external controller is being used to manage the reconciliation of the DNSRecord resources such as [external-dns](https://github.com/kubernetes-sigs/external-dns).
+In ths example if the DNSPolicy was attached to the same gateway described in example 1, the same DNSRecord would also be created but the `DNSRecord` controller would not reconcile it. In this scenario it is expected that an external controller is being used to manage the reconciliation of the DNSRecord resources such as [external-dns](https://github.com/kubernetes-sigs/external-dns).
+
+**Example 3.** DNSPolicy using `simple` routing strategy on multi cluster gateway
+
+```yaml
+apiVersion: kuadrant.io/v1alpha1
+kind: DNSPolicy
+metadata:
+  name: prod-web
+  namespace: my-gateways
+spec:
+  providerRef:
+    name: my-route53-credentials
+    namespace: my-gateways
+    kind: Secret
+  targetRef:
+    name: prod-web
+    group: gateway.networking.k8s.io
+    kind: Gateway
+  routingStrategy: simple
+```
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: prod-web
+  namespace: my-gateways
+spec:
+  gatewayClassName: kuadrant-multi-cluster-gateway-instance-per-cluster
+  listeners:
+    - allowedRoutes:
+        namespaces:
+          from: All
+      name: api
+      hostname: "myapp.mn.hcpapps.net"
+      port: 80
+      protocol: HTTP
+status:
+  addresses:
+    - type: kuadrant.io/MultiClusterIPAddress
+      value: 172.31.200.0
+    - type: kuadrant.io/MultiClusterIPAddress
+      value: 172.31.201.0
+```
+
+Similar to example 1, except here the Gateway is a multi cluster gateway that has had its status updated by the `Gateway` controller to include `kuadrant.io/MultiClusterIPAddress` type addresses.
+As the `simple` routing strategy is set in the DNSPolicy a DNSRecord resource with the following contents will be created:
+
+```yaml
+apiVersion: kuadrant.io/v1alpha1
+kind: DNSRecord
+metadata:
+  name: prod-web-api
+  namespace: my-gateways
+spec:
+  providerRef:
+    name: my-route53-credentials
+    namespace: my-gateways
+  endpoints:
+    - dnsName: myapp.mn.hcpapps.net
+      recordTTL: 60
+      recordType: A
+      targets:
+        - 172.31.200.0
+        - 172.31.201.0
+```
 
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
@@ -119,12 +185,12 @@ In ths example if the DNSPolicy was attached to the same gateway described in ex
 DNSPolicy:
 
 - new providerRef field `spec.providerRef`
-- - new strategy field `spec.strategy` 
+- new routingStrategy field `spec.routingStrategy` 
 
 DNSRecord:
  
 - `spec.managedZone` replaced with `spec.providerRef`
-- - new zoneID field `spec.zoneID`
+- new zoneID field `spec.zoneID`
 
 ManagedZone:
 
@@ -134,15 +200,15 @@ ManagedZone:
 
 The `providerRef` field is mandatory and contains a reference to a resource that shows how DNSRecords will be reconciled.
     - `spec.providerRef.name` - name of the provider resource
-    - `spec.providerRef.kind` - kind of resource, can be anything but only `Secret` or `Managedzone` will be reconciled by MGC.
+    - `spec.providerRef.kind` - kind of resource, can be anything but only `Secret` or `Managedzone` will be reconciled by the `DNSPolicy` controller.
 
-A kind of type `Secret` will be managed by MGC, and a secret in the dns policies namespace with the given name must exist. The expected contents of the secrets data is comparable to the `dnsProviderSecretRef` used by ManageZones.
+A kind of type `Secret` will be managed by the `DNSPolicy` controller, and a secret in the dns policies namespace with the given name must exist. The expected contents of the secrets data is comparable to the `dnsProviderSecretRef` used by ManageZones.
 
 ```yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mgc-aws-credentials
+  name: aws-credentials
 type: kuadrant.io/aws
 data:
   AWS_ACCESS_KEY_ID: "foo"
@@ -155,17 +221,17 @@ data:
 The `CONFIG` section of the secrets data will be added to allow provider specific configuration to be stored alongside the providers credentials and can be used during the instantiation of the provider client, and during any provider operations.
 The above for example would use the `zoneIDFilter` value to limit what hosted zones this provider is allowed to update.
 
-A kind of type `ManagedZone` will be managed by MGC, and a ManagedZone in the dns policies namespace with the given name must exist. 
+A kind of type `ManagedZone` will be managed by the `DNSPolicy` controller, and a ManagedZone in the dns policies namespace with the given name must exist. 
 
-A kind of any other type e.g. `ExternalDNS` informs MGC that it should not reconcile any resources referencing it. All fields of `providerRef` will be ignored by MGC and can be set to anything, however since the `providerRef` will still be copied over to any DNSRecord resources created by the policy controller the values may still be given meaning to that external DNSRecord reconciler.
+A kind of any other type e.g. `ExternalDNS` informs the `DNSPolicy` controller that it should not reconcile any resources referencing it. All fields of `providerRef` will be ignored by the `DNSPolicy` controller and can be set to anything, however since the `providerRef` will still be copied over to any DNSRecord resources created by the policy controller the values may still be given meaning to that external DNSRecord reconciler.
 
-### DNSPolicy.spec.strategy[simple|loadalanced]
+### DNSPolicy.spec.routingStrategy[simple|weightedGeo]
 
-The `strategy` field is mandatory and dictates what kind of dns record structure the policy will create. Two strategy options are allowed `simple` or `loadbalanced`.
+The `routingStrategy` field is mandatory and dictates what kind of dns record structure the policy will create. Two routing strategy options are allowed `simple` or `weightedGeo`.
 
-A reconciliation of DNSPolicy processes the target gateway and creates a DNSRecord per listener that is supported by the currently configured provider(hostname matches the hosted zones accessible with the credentials and config). The strategy used will determine the contents of the DNSRecord resources Endpoints array.
+A reconciliation of DNSPolicy processes the target gateway and creates a DNSRecord per listener that is supported by the currently configured provider(hostname matches the hosted zones accessible with the credentials and config). The routing strategy used will determine the contents of the DNSRecord resources Endpoints array.
 
-#### Simple
+#### simple
 
 ```yaml
 apiVersion: kuadrant.io/v1alpha1
@@ -183,7 +249,9 @@ spec:
         - 172.31.200.0
 ```
 
-#### LoadBalanced
+Simple creates a single endpoint for an A record with multiple targets. Although intended for use in a single cluster context a simple routing strategy can still be used in a multi-cluster environment (OCM hub). In this scenario each clusters address will be added to the targets array to create a multi answer section in the dns response.
+
+#### weightedGeo
 
 ```yaml
 apiVersion: kuadrant.io/v1alpha1
@@ -224,7 +292,9 @@ spec:
         - 172.31.200.0
 ```
 
-Note: `LoadBalanced` is the current default for DNSPolicy and more details about it can be found in the original [DNSPolicy rfc](https://github.com/Kuadrant/architecture/blob/main/rfcs/0003-dns-policy.md) 
+WeightedGeo creates a more complex set of endpoints which use a combination of weighted and geo routing strategies. Although intended for use in a multi-cluster environment  (OCM hub) it will still be possible to use it in a single cluster context. In this scenario the record structure described above would be created for the single cluster.
+
+This is the current default for DNSPolicy in a multi-cluster environment (OCM hub) and more details about it can be found in the original [DNSPolicy rfc](https://github.com/Kuadrant/architecture/blob/main/rfcs/0003-dns-policy.md).
 
 ### DNSRecord.spec.providerRef
 
@@ -264,7 +334,9 @@ In the case of a ManagedZone a providerRef kind of type `ManagedZone` will not b
 # Unresolved questions
 [unresolved-questions]: #unresolved-questions
 
-When a provider is configured using a kind not supported by MGC e.g. `ExternalDNS` we will be relying on an external controller to correctly update the status of any DNSRecord resources created by our policy. This may have a negative impact on our ability to correctly report status back to the target resource.
+When a provider is configured using a kind not supported by the `DNSPolicy` controller e.g. `ExternalDNS` we will be relying on an external controller to correctly update the status of any DNSRecord resources created by our policy. This may have a negative impact on our ability to correctly report status back to the target resource.
+
+When using a weightedGeo routing strategy in a single cluster context it is not expected that this will offer multi cluster capabilities without the use of OCM. Currently, it is expected that if you want to create a recordset that contains the addresses of multiple clusters you must use an OCM hub.
 
 # Future possibilities
 [future-possibilities]: #future-possibilities
