@@ -8,7 +8,7 @@
 # Summary
 [summary]: #summary
 
-Proposal for changes to the `DNSPolicy` API to allow it to work more effectively in a single cluster context.
+Proposal for changes to the `DNSPolicy` API to allow it to provide a simple dns strategy as an option in a single cluster context. This will remove, but not negate, the complex DNS structure we use in a multi-cluster environment and in doing so allow use of popular dns integrators such as external-dns .
 
 # Motivation
 [motivation]: #motivation
@@ -16,7 +16,7 @@ Proposal for changes to the `DNSPolicy` API to allow it to work more effectively
 The [`DNSPolicy`](https://github.com/Kuadrant/multicluster-gateway-controller/blob/main/pkg/apis/v1alpha1/dnspolicy_types.go) API (v1alpha1), was implemented as part of our multi cluster gateway offering using OCM and as such the design and implementation were influenced heavily by how we want multi cluster dns to work.
 
 * Decouple the API entirely from OCM and multi cluster specific concepts.
-* Simplify the DNS record structure created for a gateway listeners host.
+* Simplify the DNS record structure created for a gateway listeners host for single cluster use.
 * Improve the likelihood of adoption by creating an integration path for other kubernetes dns controllers such as [external-dns](https://github.com/kubernetes-sigs/external-dns).
 
 # Guide-level explanation
@@ -88,7 +88,7 @@ spec:
         - 172.31.200.0
 ```
 
-The `providerRef` is included in the DNSRecord to allow the MGC dns record controller to load the appropriate provider during reconciliation and create the DNS records in the dns provider service e.g. route 53.
+The `providerRef` is included in the DNSRecord to allow the MGC dns record controller to load the appropriate provider configuration during reconciliation and create the DNS records in the dns provider service e.g. route 53, by default the provider `Kind` is a secret.
 
 **Example 2.** DNSPolicy using `simple` strategy with external dns provider
 
@@ -118,28 +118,31 @@ In ths example if the DNSPolicy was attached to the same gateway described in ex
 
 DNSPolicy:
 
-* - new providerRef field `spec.providerRef` 
-* - new strategy field `spec.strategy` 
+- new providerRef field `spec.providerRef`
+- - new strategy field `spec.strategy` 
 
 DNSRecord:
-
+ 
 - `spec.managedZone` replaced with `spec.providerRef`
+- - new zoneID field `spec.zoneID`
+
+ManagedZone:
+
+- `spec.dnsProviderSecretRef` replaced with `spec.providerRef`
 
 ### DNSPolicy.spec.providerRef
 
 The `providerRef` field is mandatory and contains a reference to a resource that shows how DNSRecords will be reconciled.
-    * - `spec.providerRef.name` - name of the provider resource
-    * - `spec.providerRef.namespace` - namespace of provider resource
-    * - `spec.providerRef.kind` - kind of resource, can be anything but only `Secret` will be reconciled by MGC.
+    - `spec.providerRef.name` - name of the provider resource
+    - `spec.providerRef.kind` - kind of resource, can be anything but only `Secret` or `Managedzone` will be reconciled by MGC.
 
-A kind of type `Secret` will be managed by MGC, and a secret in the given namespace with the given name must exist. The expected contents of the secrets data is comparable to the `dnsProviderSecretRef` used by ManageZones. 
+A kind of type `Secret` will be managed by MGC, and a secret in the dns policies namespace with the given name must exist. The expected contents of the secrets data is comparable to the `dnsProviderSecretRef` used by ManageZones.
 
 ```yaml
 apiVersion: v1
 kind: Secret
 metadata:
   name: mgc-aws-credentials
-  namespace: multi-cluster-gateways
 type: kuadrant.io/aws
 data:
   AWS_ACCESS_KEY_ID: "foo"
@@ -151,6 +154,8 @@ data:
 
 The `CONFIG` section of the secrets data will be added to allow provider specific configuration to be stored alongside the providers credentials and can be used during the instantiation of the provider client, and during any provider operations.
 The above for example would use the `zoneIDFilter` value to limit what hosted zones this provider is allowed to update.
+
+A kind of type `ManagedZone` will be managed by MGC, and a ManagedZone in the dns policies namespace with the given name must exist. 
 
 A kind of any other type e.g. `ExternalDNS` informs MGC that it should not reconcile any resources referencing it. All fields of `providerRef` will be ignored by MGC and can be set to anything, however since the `providerRef` will still be copied over to any DNSRecord resources created by the policy controller the values may still be given meaning to that external DNSRecord reconciler.
 
@@ -223,64 +228,45 @@ Note: `LoadBalanced` is the current default for DNSPolicy and more details about
 
 ### DNSRecord.spec.providerRef
 
+More details of `providerRef` found in [DNSPolicy.spec.providerRef](#dnspolicyspecproviderref)
+
 The DNSRecord API is updated to remove the `managedZone` reference in favour of directly referencing the `providerRef` credentials instead. The DNSRecord reconciliation will be unchanged except for loading the provider client from `providerRef` credentials.
 
 The DNSPolicy reconciliation will be updated to remove the requirement for a ManagedZone resource to be created before a DNSPolicy can create dns records for it, instead it will be replaced in favour of just listing available zones directly in the currently configured dns provider. If no matching zone is found, no DNSRecord will be created.
 
-There is a potential for a DNSRecord to be created successfully, but then a provider updated to remove access. In this case it is the responsibility of the DNSPolicy controller to remove DNSRecords it created that can no longed be reconciled into the configured provider. 
+There is a potential for a DNSRecord to be created successfully, but then a provider updated to remove access. In this case it is the responsibility of the DNSPolicy controller to report appropriate status back to the policy and target resource about the failure to process the record. More details on how status will be reported can be found in [rfc-0004](https://github.com/Kuadrant/architecture/blob/main/rfcs//0004-rlp-status.md)
 
+### DNSRecord.spec.zoneID
 
-# Rationale and alternatives
-[rationale-and-alternatives]: #rationale-and-alternatives
+The `zoneID` field is mandatory and contains the provider specific id of the hosted zone that this record should be published into. 
 
-```
-- Why is this design the best in the space of possible designs?
-- What other designs have been considered and what is the rationale for not choosing them?
-- What is the impact of not doing this?
-```
+The DNSRecord reconciliation will use this zone when creating/updating or deleting endpoints for this record set. 
 
-ToDo
+The `zoneID` should not change after being selected during initial creation and as such will be marked as immutable.
+
+### ManagedZone.spec.providerRef
+
+More details of `providerRef` found in [DNSPolicy.spec.providerRef](#dnspolicyspecproviderref)
+
+Replaces the existing `dnsProviderSecretRef` for consistency with other resources that require a provider reference (DNSRecord and DNSPolicy). 
+
+In the case of a ManagedZone a providerRef kind of type `ManagedZone` will not be allowed and will be rejected during create/update.  
 
 # Prior art
 [prior-art]: #prior-art
 
-```
-Discuss prior art, both the good and the bad, in relation to this proposal.
-A few examples of what this can include are:
-
-- Does another project have a similar feature?
-- What can be learned from it? What's good? What's less optimal?
-- Papers: Are there any published papers or great posts that discuss this? If you have some relevant papers to refer to, this can serve as a more detailed theoretical background.
-
-This section is intended to encourage you as an author to think about the lessons from other tentatives - successful or not, provide readers of your RFC with a fuller picture.
-
-Note that while precedent set by other projects is some motivation, it does not on its own motivate an RFC.
-```
-
-ToDo
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns)
 
+* Uses annotations on the target Gateway as opposed to a proper API.
+* Requires access to the HTTP route resources.
+* Supports only a single provider per external dns instance.
 
 # Unresolved questions
 [unresolved-questions]: #unresolved-questions
 
-```
-- What parts of the design do you expect to resolve through the RFC process before this gets merged?
-- What parts of the design do you expect to resolve through the implementation of this feature before stabilization?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
-```
-
-ToDo
+When a provider is configured using a kind not supported by MGC e.g. `ExternalDNS` we will be relying on an external controller to correctly update the status of any DNSRecord resources created by our policy. This may have a negative impact on our ability to correctly report status back to the target resource.
 
 # Future possibilities
 [future-possibilities]: #future-possibilities
 
-```
-Think about what the natural extension and evolution of your proposal would be and how it would affect the platform and project as a whole. Try to use this section as a tool to further consider all possible interactions with the project and its components in your proposal. Also consider how this all fits into the roadmap for the project and of the relevant sub-team.
-
-This is also a good place to "dump ideas", if they are out of scope for the RFC you are writing but otherwise related.
-
-Note that having something written down in the future-possibilities section is not a reason to accept the current or a future RFC; such notes should be in the section on motivation or rationale in this or subsequent RFCs. The section merely provides additional information. 
-```
-
-ToDo
+The ability to support other kubernetes dns controllers such as ExternalDNS would potentially allow us to contribute to some of these projects in the area of polices for dns management of Gateway resources in kubernetes.
