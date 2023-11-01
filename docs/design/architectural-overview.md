@@ -62,7 +62,7 @@ In order to provide its full suite of functionality, Kuadrant has several depend
     - Required.
 - **[Thanos/Prometheus/Grafana](https://thanos.io):** (provide observability integration)
     - Optional: We look to leverage the existing technology and provide dashboards etc for ingress rather than any specific observability tooling
-- **[Istio.io](https://istio):**
+- **[Istio](https://istio.io):**
 Gateway API provider that Kuadrant integrates with via WASM and Istio APIS to provide service protection capabilities.
    - Required if you want to use RateLimitPolicy and AuthPolicy
 - **[Gateway API](https://github.com/kubernetes-sigs/gateway-api):**
