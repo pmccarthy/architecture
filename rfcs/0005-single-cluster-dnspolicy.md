@@ -1,4 +1,4 @@
-# RFC Template
+# Single Cluster DNSPolicy
 
 - Feature Name: `single-cluster-dnspolicy`
 - Start Date: 2023-10-09
