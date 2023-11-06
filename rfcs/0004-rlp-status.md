@@ -1,9 +1,9 @@
-# RFC Template
+# Policy Status
 
 - Feature Name: `policy_status_states`
 - Start Date: 2023-02-03
 - RFC PR: [Kuadrant/architecture#0009](https://github.com/Kuadrant/architecture/pull/9)
-- Issue tracking: [Kuadrant/architecture#0000](https://github.com/Kuadrant/architecture/issues/0000)
+- Issue tracking: [Kuadrant/architecture#0038](https://github.com/Kuadrant/architecture/issues/38)
 
 # Summary
 [summary]: #summary
