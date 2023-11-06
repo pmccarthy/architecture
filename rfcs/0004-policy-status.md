@@ -45,7 +45,7 @@ States rationale:
 * `TargetNotFound`: This state will be set when the `Reconciliation` process encounters an error.
 * `Conflicted`: This state will be set when the `Reconciliation` process encounters an error.
 
-![](0004-rlp-status-assets/rlp_status_4.png)
+![](0004-policy-status-assets/policy_status_4.png)
 
 Notes:
 * States from the Stage 2 could be implemented as well, but only relying on _Validation_ and _Reconciliation_ events.
@@ -62,7 +62,7 @@ States rationale:
 * `PartiallyEnforced`: This state will be set when the `Reconciliation` event encounters an overlap with other policies.
 * `Overridden`: This state will be set when the `Reconciliation` event invalidates the policy because another one takes precedence.
 
-![](0004-rlp-status-assets/rlp_status_5.png)
+![](0004-policy-status-assets/policy_status_5.png)
 
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
@@ -134,7 +134,7 @@ the final design proposed.
   This first stage is a simple version where the operator only relies on itself, not checking the healthiness with the
   Kuadrant services, but just validating the Spec.
 
-  ![](0004-rlp-status-assets/rlp_status_1.png)
+  ![](0004-policy-status-assets/policy_status_1.png)
 
   States rationale:
   * `Created`: The initial state. It announces that the policy has successfully being created, the operator acknowledges it.
@@ -149,7 +149,7 @@ the final design proposed.
   process of any needed Kubernets object, Kuadrant Services custom resources and any other 3rd party CR required.
   An example would be in the case of the RLP, it would create/update the `ConfigMap` holding the `Limitador` config file.
 
-  ![](0004-rlp-status-assets/rlp_status_2.png)
+  ![](0004-policy-status-assets/policy_status_2.png)
 
   States rationale:
   * `Applied`: The __Applied__ state would not be final, and would be preceding a `Reconciliation` event.
@@ -161,7 +161,7 @@ the final design proposed.
   The final stage would bring a greater degree of accuracy, thanks for a final process that would check the healthiness and
   configuration version the Kuadrant services currently enforces.
 
-  ![](0004-rlp-status-assets/rlp_status_3.png)
+  ![](0004-policy-status-assets/policy_status_3.png)
 
   States rationale:
   * `Reconciled`: This state would precede the "Health check" process  graphed as `Service Probe` event.
