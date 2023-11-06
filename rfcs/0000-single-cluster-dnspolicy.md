@@ -28,7 +28,7 @@ In this context the advanced `loadbalancing` configuration is unnecessary, and t
 **Example 1.** DNSPolicy using `simple` routing strategy
 
 ```yaml
-apiVersion: kuadrant.io/v1alpha1
+apiVersion: kuadrant.io/v1alpha2
 kind: DNSPolicy
 metadata:
   name: prod-web
@@ -71,7 +71,7 @@ In the example the `api` listener has a hostname `myapp.mn.hcpapps.net` that mat
 As the `simple` routing strategy is set in the DNSPolicy a DNSRecord resource with the following contents will be created:
 
 ```yaml
-apiVersion: kuadrant.io/v1alpha1
+apiVersion: kuadrant.io/v1alpha2
 kind: DNSRecord
 metadata:
   name: prod-web-api
@@ -93,7 +93,7 @@ The `providerRef` is included in the DNSRecord to allow the dns record controlle
 **Example 2.** DNSPolicy using `simple` routing strategy with external dns provider
 
 ```yaml
-apiVersion: kuadrant.io/v1alpha1
+apiVersion: kuadrant.io/v1alpha2
 kind: DNSPolicy
 metadata:
   name: prod-web
@@ -114,7 +114,7 @@ In ths example if the DNSPolicy was attached to the same gateway described in ex
 **Example 3.** DNSPolicy using `simple` routing strategy on multi cluster gateway
 
 ```yaml
-apiVersion: kuadrant.io/v1alpha1
+apiVersion: kuadrant.io/v1alpha2
 kind: DNSPolicy
 metadata:
   name: prod-web
@@ -159,7 +159,7 @@ Similar to example 1, except here the Gateway is a multi cluster gateway that ha
 As the `simple` routing strategy is set in the DNSPolicy a DNSRecord resource with the following contents will be created:
 
 ```yaml
-apiVersion: kuadrant.io/v1alpha1
+apiVersion: kuadrant.io/v1alpha2
 kind: DNSRecord
 metadata:
   name: prod-web-api
@@ -185,16 +185,19 @@ spec:
 DNSPolicy:
 
 - new providerRef field `spec.providerRef`
-- new routingStrategy field `spec.routingStrategy` 
+- new routingStrategy field `spec.routingStrategy`
+- new api version `v1alpha2`
 
 DNSRecord:
  
 - `spec.managedZone` replaced with `spec.providerRef`
-- new zoneID field `spec.zoneID`
+- new zoneID field `spec.zoneID` 
+- new api version `v1alpha2`
 
 ManagedZone:
 
 - `spec.dnsProviderSecretRef` replaced with `spec.providerRef`
+- new api version `v1alpha2`
 
 ### DNSPolicy.spec.providerRef
 
@@ -234,7 +237,7 @@ A reconciliation of DNSPolicy processes the target gateway and creates a DNSReco
 #### simple
 
 ```yaml
-apiVersion: kuadrant.io/v1alpha1
+apiVersion: kuadrant.io/v1alpha2
 kind: DNSRecord
 spec:
   providerRef:
@@ -254,7 +257,7 @@ Simple creates a single endpoint for an A record with multiple targets. Although
 #### weightedGeo
 
 ```yaml
-apiVersion: kuadrant.io/v1alpha1
+apiVersion: kuadrant.io/v1alpha2
 kind: DNSRecord
 spec:
   providerRef:
