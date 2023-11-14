@@ -14,11 +14,11 @@ Enable configuration of sub components of Kuadrant from a centralized location, 
 [motivation]: #motivation
 
 The initial request comes from MGC to configure Redis for Limitador by the following issue [#163](https://github.com/Kuadrant/kuadrant-operator/issues/163).
-MGCs current work around is to update the Limitador CR after the deployment with the configuration setting for Redis Instance.
-This change would allow for the configuration sub components before the Kuadrant is deployed. 
+MGC's current work around is to update the Limitador CR after the deployment with the configuration setting for Redis Instance.
+This change would allow for the configuration of sub components before the Kuadrant is deployed. 
 
-As a kuadrant user this reduces the number of CRs that they are required to modify to get the installation they require.
-The sub components CRDs (Authorino, Limitador) never have to be modified by a Kuadrant user (and should never be modified by a Kuadrant User).
+This reduces the number of CRs that users of Kuadrant are required to modify to get the installation they require.
+The sub components CRs (Authorino, Limitador) never have to be modified by a Kuadrant user (and should never be modified by a Kuadrant User).
 
 # Guide-level explanation
 [guide-level-explanation]: #guide-level-explanation
@@ -49,7 +49,7 @@ spec:
         resourceRequirements: ...
         storage: ...
     authorino:
-        eveluatorCacheSize: ...
+        evaluatorCacheSize: ...
         healthz: ...
         listener: ...
         logLevel: ...
@@ -70,7 +70,7 @@ The feature is meant for dev and testing purposes.
 If a user wishes to use a different image, they can.
 Kuadrant assumes they know what they are doing but requires the user to set the change on the component directly.
 
-Only the sub component operator will be responsible for actioning the configurations pasted form the Kuadrant CR to the sub components CR.
+Only the sub component operator will be responsible for actioning the configurations pasted from the Kuadrant CR to the sub components CR.
 This ensure no extra changes will be required in the sub operators to meet the needs of Kuadrant.
 
 Status errors related to the configuration of the sub components should be reported back to the Kuadrant CR.
@@ -112,7 +112,7 @@ This can be Kubernetes native or external tooling.
 - tracing
 
 #### Application Settings
-- eveluatorCacheSize
+- evaluatorCacheSize
 - listener
 - oidcServer
 - volumes
@@ -149,7 +149,7 @@ In the case of Kuadrant the runtime configuration for Limitador is added via the
 #### Unsupported
 - clusterWide
 - authConfigLabelSelectors
-- secrtLabelSelectors
+- secretLabelSelectors
 
 #### Dev/Testing focused
 - image
