@@ -11,15 +11,17 @@
 The ability for the Multicluster Gateway Controller to sync policies defined in
 the hub cluster downstream to the spoke clusters, therefore allowing all policies
 to be defined in the same place. These policies will be reconciled by the downstream
-Gateway controller.
+policy controller(s).
 
 # Nomenclature
 
 * Policy: When refering to a Policy, this document is refering to a Gateway API
   policy as defined in the Policy Attachment Model. The Multicluster Gateway Controller
-  relies on [OCM]() as a Multicluster solution, which defines its own unrelated
+  relies on [OCM](https://open-cluster-management.io/) as a Multicluster solution, which defines its own unrelated
   set of Policies and Policy Framework. Unless explicitely mentioned, this document
   refers to Policies as Gateway API Policies.
+
+* Policy overriding: The concept of policy overriding is mentioned in this document. It refers to the proposed ability of the downstream Gateway implementation to prioritise downstream Policies against synced Policies in case of conflicts.
 
 # Motivation
 [motivation]: #motivation
@@ -125,6 +127,13 @@ controller must be aware of the `policy-synced` annotation.
 
 # Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
+
+## Alternatives
+
+Different technology stacks are available to sync resources across clusters. However, adoption of these technologies for the purpose of the goal this RFC intends to achieve, implies adding another dependency to the current stack, with the cost of added complexity and maintainance effort.
+
+The MGC currently uses OCM to place Gateways across clusters. Relying on OCM for the purpose of placing Policies is the most straightforward alternative from a design and implementation point of view.
+
 
 ## Consequences of not implementing
 
