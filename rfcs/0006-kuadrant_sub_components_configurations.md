@@ -1,8 +1,8 @@
 # Configuration of Kuadrant Sub Components
 
-- Feature Name: Configuration of Kuadrant Sub components.
-- Start Date: (fill me in with today's date, YYYY-MM-DD)
-- RFC PR: [Kuadrant/architecture#0000](https://github.com/Kuadrant/architecture/pull/0000)
+- Feature Name: `sub-components-config`
+- Start Date: 2023-09-11
+- RFC PR: [Kuadrant/architecture#25](https://github.com/Kuadrant/architecture/pull/25)
 - Issue tracking: [Kuadrant/kuadrant-operator#163](https://github.com/Kuadrant/kuadrant-operator/issues/163)
 
 # Summary
