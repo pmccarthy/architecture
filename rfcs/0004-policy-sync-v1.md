@@ -71,6 +71,13 @@ by placing the policy in the spoke clusters, with the following mutations:
 * The `TargetRef` of the policy is changed to reference the downstream Gateway
 * The `kuadrant.io/policy-synced` annotation is set
 
+The upstream policy is annotated with a reference to the name and namespace
+of the downstream policies:
+  ```yaml
+  annotations:
+    "kuadrant.io/policies-synced": "[{\"cluster\": \"...\", \"name\": \"...\", \"namespace\": \"...\"}]"
+  ```
+
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
 
@@ -114,7 +121,10 @@ The controller will set the `kuadrant.io/policy-synced` annotation on the policy
 when placing it in the spoke cluster.
 
 The Kuadrant operator will be aware of the presence of this annotation, and, in case
-of conflicts, override Policies that contain this annotation.
+of conflicts, override Policies that contain this annotation. When a policy is
+overriden due to conflicts, the `Enforced` status will be set to `False`, with
+the reason being `Overriden` and a human readable message explaining the reason
+why the policy was overriden. See [Policy Status RFC](./0004-policy-status.md)
 
 # Drawbacks
 [drawbacks]: #drawbacks
