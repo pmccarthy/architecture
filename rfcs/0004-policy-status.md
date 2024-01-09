@@ -95,7 +95,7 @@ third "Unknown" status.
 
 ## Policy ancestor status
 
-The Status stanza of the policy CRs must implement Gateway API's [PolicyAncestorStatus](https://github.com/youngnick/gateway-api/blob/main/geps/gep-713.md#standard-status-struct)
+The Status stanza of the policy CRs must implement Gateway API's [PolicyAncestorStatus](https://gateway-api.sigs.k8s.io/geps/gep-713/#standard-status-struct)
 struct. This will provide broader consistency and improved discoverability of effective policies.
 
 ## Implementation details/requisites
@@ -119,7 +119,7 @@ objects and apiserver load.
 [rationale-and-alternatives]: #rationale-and-alternatives
 
 Another option was considered (previously referred to as "Option 1"). While valid, this alternative would not align
-with [GEP-713](https://github.com/youngnick/gateway-api/blob/main/geps/gep-713.md), neither it would be as flexible as
+with [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713), neither it would be as flexible as
 the final design proposed.
 
 <details>
