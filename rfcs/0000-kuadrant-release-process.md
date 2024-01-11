@@ -21,13 +21,45 @@ in charge of the release process, which is not ideal.
 # Guide-level explanation
 [guide-level-explanation]: #guide-level-explanation
 
-Explain the proposal as if it was implemented and you were teaching it to Kuadrant user. That generally means:
+First, we need to define what releasing Kuadrant means, in a clear and transparent way that communicates to the community
+what's happening and what to expect. This includes:
 
-- Introducing new named concepts.
-- Explaining the feature largely in terms of examples.
-- Explaining how a user should *think* about the feature, and how it would impact the way they already use Kuadrant. It should explain the impact as concretely as possible.
-- If applicable, provide sample error messages, deprecation warnings, or migration guidance.
-- If applicable, describe the differences between teaching this to existing and new Kuadrant users.
+- Components included in each release
+- Versioning
+- Cadence
+- Repositories and Hubs
+- Documentation
+- Communication
+
+## Components and versioning
+
+The set of components that are part of the _Kuadrant suite_ are the following:
+
+- [Authorino](https://github.com/Kuadrant/authorino): Kubernetes-native authorization service for tailor-made Zero Trust API security.
+- [Authorino Operator](https://github.com/Kuadrant/authorino-operator): A Kubernetes Operator to manage Authorino instances.
+- [Limitador](https://github.com/Kuadrant/limitador): A generic rate-limiter written in Rust.
+- [Limitador Operator](https://github.com/Kuadrant/limitador-operator/): A Kubernetes Operator to manage Limitador deployments.
+- [Wasm Shim](https://github.com/Kuadrant/wasm-shim/): A Proxy-Wasm module written in Rust, acting as a shim between Envoy and Limitador.
+- [Multicluster Gateway Controller](https://github.com/Kuadrant/multicluster-gateway-controller): Provides multi-cluster
+connectivity and global load balancing.
+- [Kuadrant Operator](https://github.com/Kuadrant/kuadrant-operator/): The Operator to install and manage the lifecycle
+of the Kuadrant components deployments.
+
+Each of them needs to be versioned independently, and the versioning scheme should follow [Semantic Versioning](https://semver.org/).
+The technical details of how to release each component are out of the scope of this RFC and could be found in the
+[Kuadrant components CI/CD](https://github.com/Kuadrant/architecture/pull/41) RFC.
+
+By releasing a new version of Kuadrant, we mean releasing a new version of every component in the suite, with their
+corresponding semantic versioning, and being the version of the **Kuadrant Operator** the one that defines the version of
+the whole suite.
+
+## Cadence
+
+The frequency of the previously mentioned components, with the exception of the **Kuadrant Operator**, could vary
+depending on the particular component needs. However, the **Kuadrant Operator** should be released every 2 weeks,
+including the latest released version of every component in the suite.
+
+
 
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
