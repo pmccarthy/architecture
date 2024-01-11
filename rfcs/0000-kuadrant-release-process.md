@@ -8,12 +8,15 @@
 # Summary
 [summary]: #summary
 
-One paragraph explanation of the feature.
+Kuadrant is a set of components that their artifacts are built and delivered independently. This RFC aims to define every
+aspect of the event of releasing a new version of the whole, in terms of versioning, cadence, communication, channels, etc.
 
 # Motivation
 [motivation]: #motivation
 
-Why are we doing this? What use cases does it support? What is the expected outcome?
+At the time being, there's no clear process nor guidelines to follow when releasing a new version of Kuadrant, which
+leads to confusion and lack of transparency. We are currently relying on internal communication and certain people
+in charge of the release process, which is not ideal.
 
 # Guide-level explanation
 [guide-level-explanation]: #guide-level-explanation
