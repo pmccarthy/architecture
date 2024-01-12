@@ -59,7 +59,37 @@ The frequency of the previously mentioned components, with the exception of the 
 depending on the particular component needs. However, the **Kuadrant Operator** should be released every 2 weeks,
 including the latest released version of every component in the suite.
 
+For a more in-depth analysis of the cadence of each component, please refer to the
+[Kuadrant Release Cadence RFC](https://github.com/pmccarthy/architecture/blob/release-cadence-proposal/rfcs/0007-project-release-cadence.md).
 
+## Repositories and Hubs
+
+Every component in Kuadrant has its own repository, and the source code is hosted in GitHub, mentioned in the previous
+section. However, the images built and manifests generated are hosted in different registries, depending on the
+component. The following table shows the different registries used by each component:
+
+| Component                       | Artifacts                                      | Registry / Hub                                                                         |
+|---------------------------------|------------------------------------------------|----------------------------------------------------------------------------------------|
+| Authorino                       | authorino images                               | [Quay.io](https://quay.io/repository/kuadrant/authorino)                               |
+| Authorino Operator              | authorino-operator images                      | [Quay.io](https://quay.io/repository/kuadrant/authorino-operator)                      |
+|                                 | authorino-operator-bundle images               | [Quay.io](https://quay.io/repository/kuadrant/authorino-operator-bundle)               |
+|                                 | authorino-operator-catalog images              | [Quay.io](https://quay.io/repository/kuadrant/authorino-operator-catalog)              |
+|                                 | authorino-operator manifests                   | [OperatorHub.io](https://operatorhub.io/operator/authorino-operator)                   |
+| Limitador                       | limitador server images                        | [Quay.io](https://quay.io/repository/kuadrant/limitador)                               |
+|                                 | limitador crate                                | [Crates.io](https://crates.io/crates/limitador)                                        |
+| Limitador Operator              | limitador-operator images                      | [Quay.io](https://quay.io/repository/kuadrant/limitador-operator)                      |
+|                                 | limitador-operator-bundle images               | [Quay.io](https://quay.io/repository/kuadrant/limitador-operator-bundle)               |
+|                                 | limitador-operator-catalog images              | [Quay.io](https://quay.io/repository/kuadrant/limitador-operator-catalog)              |
+|                                 | limitador-operator manifests                   | [OperatorHub.io](https://operatorhub.io/operator/limitador-operator)                   |
+| Wasm Shim                       | wasm-shim images                               | [Quay.io](https://quay.io/repository/kuadrant/wasm-shim)                               |
+| Multicluster Gateway Controller | multicluster-gateway-controller images         | [Quay.io](https://quay.io/repository/kuadrant/multicluster-gateway-controller)         |
+|                                 | multicluster-gateway-controller-bundle images  | [Quay.io](https://quay.io/repository/kuadrant/multicluster-gateway-controller-bundle)  |
+|                                 | multicluster-gateway-controller-catalog images | [Quay.io](https://quay.io/repository/kuadrant/multicluster-gateway-controller-catalog) |
+| Policy Controller               | policy-controller images                       | [Quay.io](https://quay.io/repository/kuadrant/policy-controller)                       |
+| Kuadrant Operator               | kuadrant-operator images                       | [Quay.io](https://quay.io/repository/kuadrant/kuadrant-operator)                       |
+|                                 | kuadrant-operator-bundle images                | [Quay.io](https://quay.io/repository/kuadrant/kuadrant-operator-bundle)                |
+|                                 | kuadrant-operator-catalog images               | [Quay.io](https://quay.io/repository/kuadrant/kuadrant-operator-catalog)               |
+|                                 | kuadrant-operator manifests                    | [OperatorHub.io](https://operatorhub.io/operator/kuadrant-operator)                    |
 
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
