@@ -91,6 +91,25 @@ component. The following table shows the different registries used by each compo
 |                                 | kuadrant-operator-catalog images               | [Quay.io](https://quay.io/repository/kuadrant/kuadrant-operator-catalog)               |
 |                                 | kuadrant-operator manifests                    | [OperatorHub.io](https://operatorhub.io/operator/kuadrant-operator)                    |
 
+## Documentation
+
+The documentation for the Kuadrant suite is compiled and available on the [Kuadrant website](https://kuadrant.io/). One
+can find the source of the documentation within each component repository, in the `docs` directory. It's important to
+note that keeping the documentation up to date is a responsibility of the component maintainers, and it needs to be
+done before releasing a new version of the component. The importance of keeping a clear and up-to-date documentation
+is crucial for the success of the project.
+
+## Communication
+
+Another important aspect of releasing a new version of the Kuadrant suite is the communication with the community and
+other teams within the organization. A few examples of the communication channels that need to be updated are:
+
+- Changelog generation
+- Release notes
+- Slack channel, in Red Hat and Kubernetes workspaces
+- Blog post, if applicable
+- Social media, if applicable
+
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
 
