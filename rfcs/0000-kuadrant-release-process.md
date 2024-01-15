@@ -113,14 +113,48 @@ other teams within the organization. A few examples of the communication channel
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
 
-This is the technical portion of the RFC. Explain the design in sufficient detail that:
+As mentioned in the previous section, the Kuadrant suite is composed of several components, each of them with its own
+set of artifacts and versioning scheme. Defining the release process of the whole suite is a complex task, and it's
+not only about the technical details of releasing the components, but also about the communication and transparency
+with the community. It also involves the definition of the cadence of the releases, and the frequency of the releases
+of each component. This section aims to provide a more in-depth analysis of the different aspects of the release process.
 
-- Its interaction with other features is clear.
-- It is reasonably clear how the feature would be implemented.
-- How error would be reported to the users.
-- Corner cases are dissected by example.
+## Components and versioning
 
-The section should return to the examples given in the previous section, and explain more fully how the detailed proposal makes those examples work.
+Taking into account the different components listed in the [Guide-level explanation section](#guide-level-explanation),
+at the time of cutting a release for any of them, it's important to keep in mind what section of the version to bump,
+given a version number MAJOR.MINOR.PATCH, increment the:
+
+* MAJOR version when you make incompatible API changes
+* MINOR version when you add functionality in a backward compatible manner
+* PATCH version when you make backward compatible bug fixes
+
+Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+
+A more detailed explanation of the versioning scheme can be found in the [Semantic Versioning](https://semver.org/) website.
+
+## Cadence
+
+Once the project is stable enough, and it's adoption increases, the community will be expecting a certain degree of
+commitment from the maintainers, and that includes a regular release cadence. The frequency of the releases of the
+different components could vary depending on the particular component needs. However, the **Kuadrant Operator** as mentioned
+in the previous section, should be released every 2 weeks as it's been already proposed, including the latest released
+version of every component in the suite. There are a few reasons for this:
+
+- Delivering Unparalleled Value to Customers: Regular releases can provide customers with regular updates and improvements.
+These updates can include new features and essential bug fixes, thus enhancing the overall value delivered to the customers.
+- Maximizing Deployment Efficiency: By releasing software at regular intervals, teams can align their activities with
+available resources and environments, ensuring optimal utilization. This leads to increased efficiency in the deployment process.
+- Risk Management: Regular releases can help identify and fix issues early, reducing the risk of major failures that could
+affect customers.
+- Feedback Cycle: Regular releases allow for quicker feedback cycles. This means that any issues or improvements
+identified by users can be addressed promptly, leading to a more refined product over time.
+- Synchronization: Regular releases can help synchronize work across different teams or departments, creating a more
+reliable, dependable solution development and delivery process.
+- Reduced Complexity: Managing a smaller number of releases can reduce complexity. For example, having many different
+releases out in the field can lead to confusion and management overhead.
+
+By committing to a release cadence, software projects can benefit from improved efficiency, risk management, faster feedback cycles, synchronization, and reduced complexity.
 
 # Drawbacks
 [drawbacks]: #drawbacks
