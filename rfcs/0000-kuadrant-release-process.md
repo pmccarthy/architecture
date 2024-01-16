@@ -62,6 +62,33 @@ the whole suite.
 The technical details of how to release each component are out of the scope of this RFC and could be found in the
 [Kuadrant components CI/CD](https://github.com/Kuadrant/architecture/pull/41) RFC.
 
+## Handover to QA
+
+Probably the most important and currently missing step in the release process is the handover to the Quality Assurance
+(QA) team. The QA team is responsible for testing the different components of the Kuadrant suite, and they need to
+be aware of the new version of the suite that is going to be released, what are the changes that are included, bug fixes
+and new features in order they can plan their testing processes accordingly. The handover to QA should happen once the
+release candidate is ready, and it's been tested by the Engineering team. The QA team should be notified in advance
+of the release, and they should be able to test the release candidate before the actual release happens.
+
+There is an ideal time to hand over to the QA team for testing, especially since we are using GitHub for orchestration,
+we could briefly define it in the following steps:
+
+1. Complete Development Work: The engineering team completes their work included in the milestone and it's merged to main branch.
+2. Prepare Release: The engineering team creates a release branch from the main branch, including the particular changes
+that configure the release (manifests, version bump, etc.)
+3. Tag Release: The engineering team tags the current state of the main branch as a release candidate. This creates a
+snapshot of the codebase that can be tested without affecting the main branch and builds the deliverables.
+4. Notify QA Team: At this time, the engineering team can notify the QA team that the deliverables for the release candidate
+are ready for testing. This notification can be done through comments on GitHub issues or via other communication channels
+like Slack.
+5. Testing: The QA team tests the release candidate, checking for any bugs or issues. They can use GitHub's issue tracking
+system to report any problems they find.
+6. Iterate: Based on the feedback from the QA team, the development team makes any necessary adjustments and repeats the
+process until the release candidate is deemed ready for production.
+7. Publish Release: Once the release candidate is ready, the engineering team publishes the release. This means that the
+Github release draft is published, and the artifacts are uploaded to the corresponding registries.
+
 ## Cadence
 
 Once the project is stable enough, and it's adoption increases, the community will be expecting a certain degree of
