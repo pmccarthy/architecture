@@ -55,9 +55,9 @@ Additional labels for pre-release and build metadata are available as extensions
 
 A more detailed explanation of the versioning scheme can be found in the [Semantic Versioning](https://semver.org/) website.
 
-By releasing a new version of Kuadrant, we mean releasing a new version of every component in the suite, with their
-corresponding semantic versioning, and being the version of the **Kuadrant Operator** the one that defines the version of
-the whole suite.
+By releasing a new version of Kuadrant, we mean releasing the set of components with their corresponding semantic versioning,
+some of them maybe freshly released, or others still using versioning from the previous one, and being the version of the
+**Kuadrant Operator** the one that defines the version of the whole suite.
 
 The technical details of how to release each component are out of the scope of this RFC and could be found in the
 [Kuadrant components CI/CD](https://github.com/Kuadrant/architecture/pull/41) RFC.
@@ -74,27 +74,26 @@ of the release, and they should be able to test the release candidate before the
 There is an ideal time to hand over to the QA team for testing, especially since we are using GitHub for orchestration,
 we could briefly define it in the following steps:
 
-1. Complete Development Work: The engineering team completes their work included in the milestone and it's merged to main branch.
-2. Prepare Release: The engineering team creates a release branch from the main branch, including the particular changes
-that configure the release (manifests, version bump, etc.)
-3. Tag Release: The engineering team tags the current state of the main branch as a release candidate. This creates a
-snapshot of the codebase that can be tested without affecting the main branch and builds the deliverables.
-4. Notify QA Team: At this time, the engineering team can notify the QA team that the deliverables for the release candidate
-are ready for testing. This notification can be done through comments on GitHub issues or via other communication channels
-like Slack.
-5. Testing: The QA team tests the release candidate, checking for any bugs or issues. They can use GitHub's issue tracking
-system to report any problems they find.
-6. Iterate: Based on the feedback from the QA team, the development team makes any necessary adjustments and repeats the
+1. Complete Development Work: The engineering team completes their work included in the milestone.
+2. Create Release Candidate: The engineering team creates Release Candidate builds and manifests for all components required
+for the release
+3. Notify QA Team: At this time, the engineering team can notify the QA team that the deliverables for the release candidate
+are ready for testing. This notification can be done through the GitHub Kuadrant board, or simply a public message in the
+Kuadrant Slack channel.
+4. Testing: The QA team tests the release candidate, checking for any bugs or issues. Then QA reports all the bugs as
+GitHub issues and communicates testing status back publicly on Slack and/or email.
+5. Iterate: Based on the feedback from the QA team, the development team makes any necessary adjustments and repeats the
 process until the release candidate is deemed ready for production.
-7. Publish Release: Once the release candidate is ready, the engineering team publishes the release. This means that the
-Github release draft is published, and the artifacts are uploaded to the corresponding registries.
+6. Publish Release: Once QA communicates that the testing has been successfully finished, the engineering team will publish
+the release both on Github and in the corresponding registries, updates documentation for the new release, and communicates
+it to all channels specified in Communication section.
 
 ## Cadence
 
 Once the project is stable enough, and it's adoption increases, the community will be expecting a certain degree of
 commitment from the maintainers, and that includes a regular release cadence. The frequency of the releases of the
 different components could vary depending on the particular component needs. However, the **Kuadrant Operator**
-it's been discussed in the past that it should be released every 2 weeks, including the latest released version
+it's been discussed in the past that it should be released every 3-4 weeks initially, including the latest released version
 of every component in the suite. There's another RFC that focuses on the actual frequency of each component, one could
 refer to the [Kuadrant Release Cadence RFC](https://github.com/pmccarthy/architecture/blob/release-cadence-proposal/rfcs/0007-project-release-cadence.md).
 
@@ -160,7 +159,8 @@ other teams within the organization. A few examples of the communication channel
 
 - Changelog generation
 - Release notes
-- Slack channel, in Red Hat and Kubernetes workspaces
+- Github Release publication
+- Slack channel in Kubernetes workspace
 - Blog post, if applicable
 - Social media, if applicable
 
