@@ -176,44 +176,30 @@ other teams within the organization. A few examples of the communication channel
 - Blog post, if applicable
 - Social media, if applicable
 
-# Drawbacks
-[drawbacks]: #drawbacks
-
-Why should we *not* do this?
 
 # Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
 
-- Why is this design the best in the space of possible designs?
-- What other designs have been considered and what is the rationale for not choosing them?
-- What is the impact of not doing this?
+The alternative to the proposal is to keep the current process, which is not ideal and leads to confusion and lack of
+transparency.
 
 # Prior art
 [prior-art]: #prior-art
 
-Discuss prior art, both the good and the bad, in relation to this proposal.
-A few examples of what this can include are:
+There's been an organically grown process for releasing new versions of the Kuadrant suite, which is not documented and
+it's been changing over time. However, there are some documentation for some of the components, worth mentioning:
 
-- Does another project have a similar feature?
-- What can be learned from it? What's good? What's less optimal?
-- Papers: Are there any published papers or great posts that discuss this? If you have some relevant papers to refer to, this can serve as a more detailed theoretical background.
-
-This section is intended to encourage you as an author to think about the lessons from other tentatives - successful or not, provide readers of your RFC with a fuller picture.
-
-Note that while precedent set by other projects is some motivation, it does not on its own motivate an RFC.
+* [Authorino release process](https://docs.google.com/document/d/1tLveyv8Zwe0wKyfUTWOlEnFeMB5aVGqIVDUjVYWax0U)
+* [Limitador release process](https://github.com/Kuadrant/limitador/blob/main/RELEASE.md)
 
 # Unresolved questions
 [unresolved-questions]: #unresolved-questions
 
-- What parts of the design do you expect to resolve through the RFC process before this gets merged?
-- What parts of the design do you expect to resolve through the implementation of this feature before stabilization?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+* What would be Kuadrant support policy?
+* How many version are we going to back-port security and bug fixes to?
+* What other teams need to be involved in the release process?
 
 # Future possibilities
 [future-possibilities]: #future-possibilities
 
-Think about what the natural extension and evolution of your proposal would be and how it would affect the platform and project as a whole. Try to use this section as a tool to further consider all possible interactions with the project and its components in your proposal. Also consider how this all fits into the roadmap for the project and of the relevant sub-team.
-
-This is also a good place to "dump ideas", if they are out of scope for the RFC you are writing but otherwise related.
-
-Note that having something written down in the future-possibilities section is not a reason to accept the current or a future RFC; such notes should be in the section on motivation or rationale in this or subsequent RFCs. The section merely provides additional information.
+Once the release process is accepted and battle-tested, we could aim to automate the process as much as possible.
