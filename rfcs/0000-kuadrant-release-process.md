@@ -146,11 +146,23 @@ component. The following table shows the different registries used by each compo
 
 ## Documentation
 
+It's important to  note that keeping the documentation up to date is a responsibility of the component maintainers, and
+it needs to be done before releasing a new version of the component. The importance of keeping a clear and up-to-date
+documentation is crucial for the success of the project.
+
 The documentation for the Kuadrant suite is compiled and available on the [Kuadrant website](https://kuadrant.io/). One
-can find the source of the documentation within each component repository, in the `docs` directory. It's important to
-note that keeping the documentation up to date is a responsibility of the component maintainers, and it needs to be
-done before releasing a new version of the component. The importance of keeping a clear and up-to-date documentation
-is crucial for the success of the project.
+can find the source of the documentation within each component repository, in the `docs` directory. However, making this
+information available on the website is a manual process, and should be done by the maintainers of the project. The
+process of updating the documentation is simple and consists of the following steps:
+
+1. Update the documentation in the corresponding component repository.
+2. In [https://github.com/Kuadrant/docs.kuadrant.io/](https://github.com/Kuadrant/docs.kuadrant.io/), update the value of
+the `import_url` within the `multirepo` in the `plugins` section of the [mkdocs.yml](https://github.com/Kuadrant/docs.kuadrant.io/blob/main/mkdocs.yml)
+file, to point to the tag or branch of the component repository that contains the updated documentation.
+3. Once the changes are merged to main, the workflow that updates the website will be triggered, and the documentation
+will be updated.
+4. If for some reason it's needed to trigger the workflow manually, one can do it from the GitHub Actions tab in the
+[docs.kuadrant.io](https://github.com/Kuadrant/docs.kuadrant.io/actions/workflows/build.yaml) (`Actions > ci > Run Workflow`).
 
 ## Communication
 
