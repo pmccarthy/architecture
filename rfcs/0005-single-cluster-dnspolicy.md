@@ -196,16 +196,15 @@ DNSRecord:
 
 ManagedZone:
 
-- `spec.dnsProviderSecretRef` replaced with `spec.providerRef`
-- new api version `v1alpha2`
+- ManagedZone API wil be removed and no longer supported as part of MGC/Kuadrant.
 
 ### DNSPolicy.spec.providerRef
 
-The `providerRef` field is mandatory and contains a reference to a resource that shows how DNSRecords will be reconciled.
-    - `spec.providerRef.name` - name of the provider resource
-    - `spec.providerRef.kind` - kind of resource, can be anything but only `Secret` or `Managedzone` will be reconciled by the `DNSPolicy` controller.
+The `providerRef` field is mandatory and contains a reference to a secret containing provider credentials.
+    - `spec.providerRef.name` - name of the provider resource.
+    - `spec.providerRef.kind` - kind of resource, must be `Secret`.
 
-A kind of type `Secret` will be managed by the `DNSPolicy` controller, and a secret in the dns policies namespace with the given name must exist. The expected contents of the secrets data is comparable to the `dnsProviderSecretRef` used by ManageZones.
+A `DNSPolicy` referencing a providerRef with a kind of type `Secret` will expect that secret to exist in the same namespace. The expected contents of the secrets data is comparable to the `dnsProviderSecretRef` used by ManageZones.
 
 ```yaml
 apiVersion: v1
@@ -223,10 +222,6 @@ data:
 
 The `CONFIG` section of the secrets data will be added to allow provider specific configuration to be stored alongside the providers credentials and can be used during the instantiation of the provider client, and during any provider operations.
 The above for example would use the `zoneIDFilter` value to limit what hosted zones this provider is allowed to update.
-
-A kind of type `ManagedZone` will be managed by the `DNSPolicy` controller, and a ManagedZone in the dns policies namespace with the given name must exist. 
-
-A kind of any other type e.g. `ExternalDNS` informs the `DNSPolicy` controller that it should not reconcile any resources referencing it. All fields of `providerRef` will be ignored by the `DNSPolicy` controller and can be set to anything, however since the `providerRef` will still be copied over to any DNSRecord resources created by the policy controller the values may still be given meaning to that external DNSRecord reconciler.
 
 ### DNSPolicy.spec.routingStrategy[simple|weightedGeo]
 
