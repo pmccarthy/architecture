@@ -36,8 +36,6 @@ metadata:
 spec:
   providerRef:
     name: my-route53-credentials
-    namespace: my-gateways
-    kind: Secret
   targetRef:
     name: prod-web
     group: gateway.networking.k8s.io
@@ -79,7 +77,6 @@ metadata:
 spec:
   providerRef:
     name: my-route53-credentials
-    namespace: my-gateways
   endpoints:
     - dnsName: myapp.mn.hcpapps.net
       recordTTL: 60
@@ -88,30 +85,9 @@ spec:
         - 172.31.200.0
 ```
 
-The `providerRef` is included in the DNSRecord to allow the dns record controller to load the appropriate provider configuration during reconciliation and create the DNS records in the dns provider service e.g. route 53, by default the provider `Kind` is a secret.
+The `providerRef` is included in the DNSRecord to allow the dns record controller to load the appropriate provider configuration during reconciliation and create the DNS records in the dns provider service e.g. route 53.
 
-**Example 2.** DNSPolicy using `simple` routing strategy with external dns provider
-
-```yaml
-apiVersion: kuadrant.io/v1alpha2
-kind: DNSPolicy
-metadata:
-  name: prod-web
-  namespace: my-gateways
-spec:
-  providerRef:
-    name: external-dns
-    kind: ExternalDNS
-  targetRef:
-    name: prod-web
-    group: gateway.networking.k8s.io
-    kind: Gateway
-  routingStrategy: simple
-```
-
-In ths example if the DNSPolicy was attached to the same gateway described in example 1, the same DNSRecord would also be created but the `DNSRecord` controller would not reconcile it. In this scenario it is expected that an external controller is being used to manage the reconciliation of the DNSRecord resources such as [external-dns](https://github.com/kubernetes-sigs/external-dns).
-
-**Example 3.** DNSPolicy using `simple` routing strategy on multi cluster gateway
+**Example 2.** DNSPolicy using `simple` routing strategy on multi cluster gateway
 
 ```yaml
 apiVersion: kuadrant.io/v1alpha2
@@ -122,8 +98,6 @@ metadata:
 spec:
   providerRef:
     name: my-route53-credentials
-    namespace: my-gateways
-    kind: Secret
   targetRef:
     name: prod-web
     group: gateway.networking.k8s.io
@@ -167,7 +141,6 @@ metadata:
 spec:
   providerRef:
     name: my-route53-credentials
-    namespace: my-gateways
   endpoints:
     - dnsName: myapp.mn.hcpapps.net
       recordTTL: 60
@@ -202,9 +175,8 @@ ManagedZone:
 
 The `providerRef` field is mandatory and contains a reference to a secret containing provider credentials.
     - `spec.providerRef.name` - name of the provider resource.
-    - `spec.providerRef.kind` - kind of resource, must be `Secret`.
 
-A `DNSPolicy` referencing a providerRef with a kind of type `Secret` will expect that secret to exist in the same namespace. The expected contents of the secrets data is comparable to the `dnsProviderSecretRef` used by ManageZones.
+A `DNSPolicy` referencing a providerRef secret will expect that secret to exist in the same namespace. The expected contents of the secrets data is comparable to the `dnsProviderSecretRef` used by ManageZones.
 
 ```yaml
 apiVersion: v1
@@ -237,8 +209,6 @@ kind: DNSRecord
 spec:
   providerRef:
     name: my-route53-credentials
-    namespace: my-gateways
-    kind: Secret
   endpoints:
     - dnsName: myapp.mn.hcpapps.net
       recordTTL: 60
@@ -257,8 +227,6 @@ kind: DNSRecord
 spec:
   providerRef:
     name: my-route53-credentials
-    namespace: my-gateways
-    kind: Secret
   endpoints:
     - dnsName: myapp.mn.hcpapps.net
       recordTTL: 300
@@ -311,14 +279,6 @@ The `zoneID` field is mandatory and contains the provider specific id of the hos
 The DNSRecord reconciliation will use this zone when creating/updating or deleting endpoints for this record set. 
 
 The `zoneID` should not change after being selected during initial creation and as such will be marked as immutable.
-
-### ManagedZone.spec.providerRef
-
-More details of `providerRef` found in [DNSPolicy.spec.providerRef](#dnspolicyspecproviderref)
-
-Replaces the existing `dnsProviderSecretRef` for consistency with other resources that require a provider reference (DNSRecord and DNSPolicy). 
-
-In the case of a ManagedZone a providerRef kind of type `ManagedZone` will not be allowed and will be rejected during create/update.  
 
 # Prior art
 [prior-art]: #prior-art
