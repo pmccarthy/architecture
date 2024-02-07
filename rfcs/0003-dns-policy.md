@@ -3,7 +3,7 @@
 - Feature Name: DNSPolicy
 - Start Date: 2023-07-01
 - RFC PR: [Kuadrant/architecture#20](https://github.com/Kuadrant/architecture/pull/20)
-- Issue tracking: [Kuadrant/architecture#0000](https://github.com/Kuadrant/multicluster-gateway-controller/issues/219)
+- Issue tracking: [Kuadrant/multicluster-gateway-controller#219](https://github.com/Kuadrant/multicluster-gateway-controller/issues/219)
 - Labels: DNS, Load Balancing, Multi-Cluster
     
 
@@ -287,4 +287,5 @@ However, there is still significant value even with this limitation. This limita
 # Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
 
-An alternative is to configure all of this yourself manually in a dns provider. This is can be a highly complex dns configuration that it would be easy to get wrong. 
+An alternative is to configure all of this yourself manually in a dns provider. This is can be a highly complex dns configuration that it would be easy to get wrong.
+
