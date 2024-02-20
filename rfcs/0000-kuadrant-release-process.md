@@ -45,8 +45,8 @@ environments.
 - [Kuadrant Operator](https://github.com/Kuadrant/kuadrant-operator/): The Operator to install and manage the lifecycle
   of the Kuadrant components deployments.
 
-Each of them needs to be versioned independently, and the versioning scheme should follow [Semantic Versioning]. At
-the time of cutting a release for any of them, it's important to keep in mind what section of the version to bump,
+Each of them needs to be versioned independently, and the versioning scheme should follow [Semantic Versioning](https://semver.org/).
+At the time of cutting a release for any of them, it's important to keep in mind what section of the version to bump,
 given a version number MAJOR.MINOR.PATCH, increment the:
 
 * MAJOR version when you make incompatible API changes
@@ -70,10 +70,12 @@ Probably the most important and currently missing step in the release process is
 (QA) team. The QA team is responsible for testing the different components of the Kuadrant suite, and they need to
 be aware of the new version of the suite that is going to be released, what are the changes that are included, bug fixes
 and new features in order they can plan their testing processes accordingly. This check is not meant to be a fully fledged
-assessment from the QA team as it would be with a downstream project when it's handover to them, it's aimed to not take
-more than 1-2 days, and be expected to be fully automated in the future. This step will happen once the release candidate
-is ready, and it's been tested by the Engineering team. The QA team should be notified in advance of the release, and
-they should be able to assert the release candidate is ready before the actual release happens.
+assessment from the QA team when it's handover to them, it's aimed to not take more than 1-2 days, and ideally expected
+to be fully automated. This step will happen once the release candidate has no PRs pending to be merged, and it has been
+tested by the Engineering team. The QA team should work closely to the engineering throughout the process, both teams aiming
+for zero handover time and continuous delivery mindset, so immediate testing can be triggered on release candidates once
+handed over. This process should happen without the need of formal communication between the teams or any overhead in
+general, but by keeping constant synergy between quality and product engineering instead.
 
 There is an ideal time to hand over to the QA team for testing, especially since we are using GitHub for orchestration,
 we could briefly define it in the following steps:
@@ -81,20 +83,17 @@ we could briefly define it in the following steps:
 1. Complete Development Work: The engineering team completes their work included in the milestone.
 2. Create Release Candidate: The engineering team creates Release Candidate builds and manifests for all components required
 for the release
-3. Notify QA Team: At this time, the engineering team can notify the QA team that the deliverables for the release candidate
-are ready for testing. This notification can be done through the GitHub Kuadrant board, or simply a public message in the
-Kuadrant Slack channel.
-4. Flagging/Testing: The QA team do the actual assertion/testing of the release candidate, checking for any obvious bugs or issues.
+3. Flagging/Testing: The QA team do the actual assertion/testing of the release candidate, checking for any obvious bugs or issues.
 Then QA reports all the bugs as GitHub issues and communicates testing status back publicly on Slack and/or email.
-5. Iterate: Based on the feedback from the QA team, the development team makes any necessary adjustments and repeats the
+4. Iterate: Based on the feedback from the QA team, the Engineering team makes any necessary adjustments and repeats the
 process until the release candidate is deemed ready for production.
-6. Publish Release: Once QA communicates that the testing has been successfully finished, the engineering team will publish
+5. Publish Release: Once QA communicates that the testing has been successfully finished, the engineering team will publish
 the release both on Github and in the corresponding registries, updates documentation for the new release, and communicates
 it to all channels specified in Communication section.
 
 ## Cadence
 
-Once the project is stable enough, and it's adoption increases, the community will be expecting a certain degree of
+Once the project is stable enough, and its adoption increases, the community will be expecting a certain degree of
 commitment from the maintainers, and that includes a regular release cadence. The frequency of the releases of the
 different components could vary depending on the particular component needs. However, the **Kuadrant Operator**
 it's been discussed in the past that it should be released every 3-4 weeks initially, including the latest released version
@@ -103,12 +102,12 @@ refer to the [Kuadrant Release Cadence RFC](https://github.com/pmccarthy/archite
 
 There are a few reasons for this:
 
-- Delivering Unparalleled Value to Customers: Regular releases can provide customers with regular updates and improvements.
-  These updates can include new features and essential bug fixes, thus enhancing the overall value delivered to the customers.
+- Delivering Unparalleled Value to Users: Regular releases can provide users with regular updates and improvements.
+  These updates can include new features and essential bug fixes, thus enhancing the overall value delivered to the users.
 - Maximizing Deployment Efficiency: By releasing software at regular intervals, teams can align their activities with
   available resources and environments, ensuring optimal utilization. This leads to increased efficiency in the deployment process.
 - Risk Management: Regular releases can help identify and fix issues early, reducing the risk of major failures that could
-  affect customers.
+  affect users.
 - Feedback Cycle: Regular releases allow for quicker feedback cycles. This means that any issues or improvements
   identified by users can be addressed promptly, leading to a more refined product over time.
 - Synchronization: Regular releases can help synchronize work across different teams or departments, creating a more
@@ -162,8 +161,8 @@ information available on the website is a manual process, and should be done by 
 process of updating the documentation is simple and consists of the following steps:
 
 1. Update the documentation in the corresponding component repository.
-2. In [https://github.com/Kuadrant/docs.kuadrant.io/](https://github.com/Kuadrant/docs.kuadrant.io/), update the value of
-the `import_url` within the `multirepo` in the `plugins` section of the [mkdocs.yml](https://github.com/Kuadrant/docs.kuadrant.io/blob/main/mkdocs.yml)
+2. Follow the instruction in [https://github.com/Kuadrant/docs.kuadrant.io/](https://github.com/Kuadrant/docs.kuadrant.io/)
+to update the Docs pointers to the tag or branch of the component repository that contains the updated documentation.
 file, to point to the tag or branch of the component repository that contains the updated documentation.
 3. Once the changes are merged to main, the workflow that updates the website will be triggered, and the documentation
 will be updated.
@@ -195,7 +194,8 @@ transparency.
 There's been an organically grown process for releasing new versions of the Kuadrant suite, which is not documented and
 it's been changing over time. However, there are some documentation for some of the components, worth mentioning:
 
-* [Authorino release process](https://docs.google.com/document/d/1tLveyv8Zwe0wKyfUTWOlEnFeMB5aVGqIVDUjVYWax0U)
+* [Authorino release process](https://github.com/Kuadrant/authorino/blob/main/RELEASE.md)
+* [Authorino Operator release process](https://github.com/Kuadrant/authorino-operator/blob/main/RELEASE.md)
 * [Limitador release process](https://github.com/Kuadrant/limitador/blob/main/RELEASE.md)
 
 # Unresolved questions
