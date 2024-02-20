@@ -8,7 +8,7 @@
 # Summary
 [summary]: #summary
 
-Kuadrant is a set of components that their artifacts are built and delivered independently. This RFC aims to define every
+Kuadrant is a set of components whose artifacts are built and delivered independently. This RFC aims to define every
 aspect of the event of releasing a new version of the whole, in terms of versioning, cadence, communication, channels,
 handover to other teams, etc.
 
@@ -62,14 +62,16 @@ some of them maybe freshly released, or others still using versioning from the p
 The technical details of how to release each component are out of the scope of this RFC and could be found in the
 [Kuadrant components CI/CD](https://github.com/Kuadrant/architecture/pull/41) RFC.
 
-## Handover to QA
+## QA Sanity Check
 
-Probably the most important and currently missing step in the release process is the handover to the Quality Assurance
+Probably the most important and currently missing step in the release process is the green flagging from the Quality Assurance
 (QA) team. The QA team is responsible for testing the different components of the Kuadrant suite, and they need to
 be aware of the new version of the suite that is going to be released, what are the changes that are included, bug fixes
-and new features in order they can plan their testing processes accordingly. The handover to QA should happen once the
-release candidate is ready, and it's been tested by the Engineering team. The QA team should be notified in advance
-of the release, and they should be able to test the release candidate before the actual release happens.
+and new features in order they can plan their testing processes accordingly. This check is not meant to be a fully fledged
+assessment from the QA team as it would be with a downstream project when it's handover to them, it's aimed to not take
+more than 1-2 days, and be expected to be fully automated in the future. This step will happen once the release candidate
+is ready, and it's been tested by the Engineering team. The QA team should be notified in advance of the release, and
+they should be able to assert the release candidate is ready before the actual release happens.
 
 There is an ideal time to hand over to the QA team for testing, especially since we are using GitHub for orchestration,
 we could briefly define it in the following steps:
@@ -80,8 +82,8 @@ for the release
 3. Notify QA Team: At this time, the engineering team can notify the QA team that the deliverables for the release candidate
 are ready for testing. This notification can be done through the GitHub Kuadrant board, or simply a public message in the
 Kuadrant Slack channel.
-4. Testing: The QA team tests the release candidate, checking for any bugs or issues. Then QA reports all the bugs as
-GitHub issues and communicates testing status back publicly on Slack and/or email.
+4. Flagging/Testing: The QA team do the actual assertion/testing of the release candidate, checking for any obvious bugs or issues.
+Then QA reports all the bugs as GitHub issues and communicates testing status back publicly on Slack and/or email.
 5. Iterate: Based on the feedback from the QA team, the development team makes any necessary adjustments and repeats the
 process until the release candidate is deemed ready for production.
 6. Publish Release: Once QA communicates that the testing has been successfully finished, the engineering team will publish
