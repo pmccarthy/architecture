@@ -40,6 +40,8 @@ The set of components that are part of the _Kuadrant suite_ are the following:
 - [Wasm Shim](https://github.com/Kuadrant/wasm-shim/): A Proxy-Wasm module written in Rust, acting as a shim between Envoy and Limitador.
 - [Multicluster Gateway Controller](https://github.com/Kuadrant/multicluster-gateway-controller): Provides multi-cluster
 connectivity and global load balancing.
+- [DNS Operator](https://github.com/Kuadrant/dns-operator): A Kubernetes Operator to manage DNS in single and multi-cluster
+environments.
 - [Kuadrant Operator](https://github.com/Kuadrant/kuadrant-operator/): The Operator to install and manage the lifecycle
   of the Kuadrant components deployments.
 
@@ -140,7 +142,9 @@ component. The following table shows the different registries used by each compo
 | Multicluster Gateway Controller | multicluster-gateway-controller images         | [Quay.io](https://quay.io/repository/kuadrant/multicluster-gateway-controller)         |
 |                                 | multicluster-gateway-controller-bundle images  | [Quay.io](https://quay.io/repository/kuadrant/multicluster-gateway-controller-bundle)  |
 |                                 | multicluster-gateway-controller-catalog images | [Quay.io](https://quay.io/repository/kuadrant/multicluster-gateway-controller-catalog) |
-| Policy Controller               | policy-controller images                       | [Quay.io](https://quay.io/repository/kuadrant/policy-controller)                       |
+| DNS Operator                    | dns-operator images                            | [Quay.io](https://quay.io/repository/kuadrant/dns-operator)                            |
+|                                 | dns-operator-bundle images                     | [Quay.io](https://quay.io/repository/kuadrant/dns-operator-bundle)                     |
+|                                 | dns-operator-catalog images                    | [Quay.io](https://quay.io/repository/kuadrant/dns-operator-catalog)                    |
 | Kuadrant Operator               | kuadrant-operator images                       | [Quay.io](https://quay.io/repository/kuadrant/kuadrant-operator)                       |
 |                                 | kuadrant-operator-bundle images                | [Quay.io](https://quay.io/repository/kuadrant/kuadrant-operator-bundle)                |
 |                                 | kuadrant-operator-catalog images               | [Quay.io](https://quay.io/repository/kuadrant/kuadrant-operator-catalog)               |
