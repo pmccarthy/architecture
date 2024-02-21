@@ -104,8 +104,9 @@ There are a few reasons for this:
 
 - Delivering Unparalleled Value to Users: Regular releases can provide users with regular updates and improvements.
   These updates can include new features and essential bug fixes, thus enhancing the overall value delivered to the users.
-- Maximizing Deployment Efficiency: By releasing software at regular intervals, teams can align their activities with
-  available resources and environments, ensuring optimal utilization. This leads to increased efficiency in the deployment process.
+- Resource Optimization: By releasing software at regular intervals, teams can align their activities with
+  available resources and environments, ensuring optimal utilization. This leads to increased efficiency in the deployment
+  process and reduces the risk of resource wastage.
 - Risk Management: Regular releases can help identify and fix issues early, reducing the risk of major failures that could
   affect users.
 - Feedback Cycle: Regular releases allow for quicker feedback cycles. This means that any issues or improvements
@@ -163,7 +164,6 @@ process of updating the documentation is simple and consists of the following st
 1. Update the documentation in the corresponding component repository.
 2. Follow the instruction in [https://github.com/Kuadrant/docs.kuadrant.io/](https://github.com/Kuadrant/docs.kuadrant.io/)
 to update the Docs pointers to the tag or branch of the component repository that contains the updated documentation.
-file, to point to the tag or branch of the component repository that contains the updated documentation.
 3. Once the changes are merged to main, the workflow that updates the website will be triggered, and the documentation
 will be updated.
 4. If for some reason it's needed to trigger the workflow manually, one can do it from the GitHub Actions tab in the
