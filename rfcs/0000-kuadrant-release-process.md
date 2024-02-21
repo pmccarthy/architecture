@@ -61,6 +61,10 @@ By releasing a new version of Kuadrant, we mean releasing the set of components 
 some of them maybe freshly released, or others still using versioning from the previous one, and being the version of the
 **Kuadrant Operator** the one that defines the version of the whole suite.
 
+```
+Kuadrant Suite vx.y.z = Kuadrant Operator vx.y.z +  Authorino Operator va.b.c + Limitador Operator vd.e.f + DNS Operator vg.h.i + MGC Controller vj.k.l + Wasm Shim vm.n.o
+```
+
 The technical details of how to release each component are out of the scope of this RFC and could be found in the
 [Kuadrant components CI/CD](https://github.com/Kuadrant/architecture/pull/41) RFC.
 
