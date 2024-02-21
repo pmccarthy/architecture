@@ -2,8 +2,8 @@
 
 - Feature Name: `kuadrant-release-process`
 - Start Date: 2024-01-11
-- RFC PR: [Kuadrant/architecture#0000](https://github.com/Kuadrant/architecture/pull/0000)
-- Issue tracking: [Kuadrant/architecture#0000](https://github.com/Kuadrant/architecture/issues/0000)
+- RFC PR: [Kuadrant/architecture#46](https://github.com/Kuadrant/architecture/pull/46)
+- Issue tracking: [Kuadrant/architecture#59](https://github.com/Kuadrant/architecture/issues/59)
 
 # Summary
 [summary]: #summary
