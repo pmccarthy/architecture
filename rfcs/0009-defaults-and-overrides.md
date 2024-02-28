@@ -224,7 +224,7 @@ The examples in this section introduce the proposal for a new `when` field for t
 
 Combined with a simple case of override policy (see [Examples C](#examples-c---override-policy-entirely-replacing-other-at-lower-level)), the `when` condition field allows modeling for use cases of setting constraints for lower-level policies.
 
-As here proposed, the value of the `when` condition field must be a valid [Common-Language Expression (CEL)](https://github.com/google/cel-spec) expression.
+As here proposed, the value of the `when` condition field must be a valid [Common Expression Language (CEL)](https://github.com/google/cel-spec) expression.
 
 **Example E1.** An _override_ policy whose rules _set constraints_ to field values of other policies at a lower level, overriding individual policy values of rules with same identification if those values violate the constraints - _lower policy is compliant with the constraint_
 
@@ -267,18 +267,21 @@ WIP
 # Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
 
+## Mutually exclusive API designs
+
 The following alternatives were considered for the design of the API spec to support D/O:
-- [**API DESIGN 1** - `strategy` field - _RECOMMENDED_](#api-design-1---strategy-field---recommended)
-- [**API DESIGN 2** - `granularity` field](#api-design-2---granularity-field)
-- [**API DESIGN 3** - `when` conditions (at any level of the spec)](#api-design-3---when-conditions-at-any-level-of-the-spec)
-- [**API DESIGN 4** - “path-keys”](#api-design-4---path-keys)
-- [**API DESIGN 5** - JSON patch-like](#api-design-5---json-patch-like)
+1. [`strategy` field](#design-option-strategy-field) - RECOMMENDED
+2. [`granularity` field](#design-option-granularity-field)
+3. [`when` conditions (at any level of the spec)](#design-option-when-conditions-at-any-level-of-the-spec)
+4. [CEL functions (at any level of the spec)](#design-option-cel-functions-at-any-level-of-the-spec)
+5. [“path-keys”](#design-option-path-keys)
+6. [JSON patch-like](#design-option-json-patch-like)
 
-All the examples in the RFC are based on API DESIGN 1.
+All the examples in the RFC are based on API design **`strategy` field**.
 
-## API DESIGN 1 - `strategy` field - _RECOMMENDED_
+### Design option: `strategy` field
 
-Each block of `defaults` and `overrides` specify a `strategy`: `atomic` or `merge`, with `atomic` assumed if the field is omitted.
+Each block of `defaults` and `overrides` specify a field `strategy: atomic | merge`, with `atomic` assumed if the field is omitted.
 
 All the examples in the RFC are based on this design for the API spec.
 
@@ -296,6 +299,7 @@ Some of the implications of the design are explained in the section [Atomic vs. 
       <td>
         <ul>
           <li>Same schema as a normal policy without D/O</li>
+          <li>Declarative</li>
           <li>Safe against "unmergeable objects" (e.g. two rules declaring different one-of options)</li>
           <li>Strong types</li>
           <li>Extensible (by adding more fields, e.g.: to support deactivations)</li>
@@ -312,9 +316,9 @@ Some of the implications of the design are explained in the section [Atomic vs. 
   </tbody>
 </table>
 
-API DESIGN 1 is the RECOMMENDED design for the implementation of Kuadrant Policies enabled for D/O. This is due to the pros above, plus the fact that this design can evolve to other, more versatile forms, such as [DESIGN 2](#api-design-2---granularity-field) and [DESIGN 3](#api-design-3---when-conditions-at-any-level-of-the-spec), in the future, while the opposite would be harder to achieve.
+The design option based on the `strategy` field is the RECOMMENDED design for the implementation of Kuadrant Policies enabled for D/O. This is due to the pros above, plus the fact that this design can evolve to other, more versatile forms, such as [**`granularity` field**](#design-option-granularity-field), [**`when` conditions**](#design-option-when-conditions-at-any-level-of-the-spec) or [**CEL functions**](#design-option-cel-functions-at-any-level-of-the-spec), in the future, while the opposite would be harder to achieve.
 
-## API DESIGN 2 - `granularity` field
+### Design option: `granularity` field
 
 Each block of `defaults` and `overrides` would specify a `granularity` field, set to a numeric integer value that describes which level of the policy spec, from the root of the set of policy rules until that number of levels down, to treat as the key, and the rest as the atomic value.
 
@@ -354,7 +358,7 @@ spec:
     <tr>
       <td>
         <ul>
-          <li>Same as OPTION 1</li>
+          <li>Same as design option <a href="#design-option-strategy-field"><b><code>strategy</code> field</b></a></li>
           <li>Unlimited levels of granularity (values can be pointed as atomic at any level)</li>
         </ul>
       </td>
@@ -369,7 +373,7 @@ spec:
   </tbody>
 </table>
 
-## API DESIGN 3 - `when` conditions (at any level of the spec)
+### Design option: `when` conditions (at any level of the spec)
 
 Inspired by the extension of the API for D/O with an additional `when` field (see [Examples E](#examples-e---override-policy-rules-setting-constraints-to-other-at-lower-level)), this design alternative would use the presence of this field to signal the granularity of the atomic operation of default or override.
 
@@ -404,7 +408,7 @@ spec:
     <tr>
       <td>
         <ul>
-          <li>Same as OPTION 2</li>
+          <li>Same as <a href="#design-option-granularity-field"><b><code>granularity</code> field</b></a></li>
           <li>As many granularity declarations per D/O block as complex objects in the policy</li>
           <li>Granularity specified “in-place”</li>
         </ul>
@@ -419,7 +423,62 @@ spec:
   </tbody>
 </table>
 
-## API DESIGN 4 - “path-keys”
+### Design option: CEL functions (at any level of the spec)
+
+This design option leans on the power of [Common Expression Language (CEL)](https://github.com/google/cel-spec), extrapolating the design alternative with [**`when` conditions**](#design-option-when-conditions-at-any-level-of-the-spec) beyond declaring a CEL expression just to determine if a statically declared value should apply. Rather, it proposes the use of [CEL functions](https://github.com/google/cel-spec/blob/master/doc/langdef.md#functions) that outputs the value to default to or to ovrride with, taking the conflicting "lower" value as input, with or without a condition as part of the CEL expression. The value of a key set to a CEL function indicates the level of granularity of the D/O operation.
+
+Example:
+
+```yaml
+kind: AuthPolicy
+metadata:
+  name: gw-policy
+spec:
+  targetRef:
+    kind: Gateway
+  defaults:
+    rules:
+      authentication:
+        "a": {…} # static value
+        "b": "cel:self.value > 3 ? AuthenticationRule{value: 3} : self"
+      authorization: |
+        cel:Authorization{
+          c: AuthorizationRule{prop1: "x"}
+        }
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>✅ Pros</th>
+      <th>❌ Cons</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <ul>
+          <li>Unlimited levels of granularity</li>
+          <li>Granularity specified “in-place”</li>
+          <li>Extremely powerful</li>
+          <li>Elegant and simple implementation-wise</li>
+        </ul>
+      </td>
+      <td>
+        <ul>
+          <li>Weakly typed</li>
+          <li>Implementation completely new – cannot reuse current API types</li>
+          <li>Requires all types to be defined as protobufs</li>
+          <li>Without strong guardrails, users can easily shoot themselves in the foot</li>
+          <li>Validation likely requires complex functions for parsing the CEL expressions</li>
+          <li>Non-declarative</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+### Design option: “path-keys”
 
 A more radical alternative considered consisted of defining `defaults` and `overrides` blocks whose schemas would not match the ones of a normal policy without D/O. Instead, these blocks would consist of simple key-value pairs, where the keys specify the paths in an affected policy where to apply the value atomically.
 
@@ -450,6 +509,7 @@ spec:
       <td>
         <ul>
           <li>D/O as simple key-value sets (keys: where to apply, values: what to apply)</li>
+          <li>Declarative</li>
           <li>Unlimited levels of granularity (values can be pointed as atomic at any level)</li>
           <li>Unlimited merge declarations per D/O block</li>
           <li>Intuitive, easy-to-learn</li>
@@ -458,7 +518,7 @@ spec:
       <td>
         <ul>
           <li>Not same schema as the normal policy (without D/O) - not very GWAPI-like</li>
-          <li>Poorly typed (i.e. <code>map[string]any)</code></li>
+          <li>Weakly typed (i.e. <code>map[string]any)</code></li>
           <li>Not extensible (e.g., cannot add other fields to the API)</code></li>
         </ul>
       </td>
@@ -466,9 +526,9 @@ spec:
   </tbody>
 </table>
 
-## API DESIGN 5 - JSON patch-like
+### Design option: JSON patch-like
 
-Similar to [DESIGN 4](#api-design-4---path-keys), inspired by [JSON patch](https://jsonpatch.com/) operations, to provide more kinds of operations and extensibility.
+Similar to the [**path-keys**](#design-option-path-keys) design option, inspired by [JSON patch](https://jsonpatch.com/) operations, to provide more kinds of operations and extensibility.
 
 Example:
 
@@ -503,14 +563,15 @@ spec:
     <tr>
       <td>
         <ul>
-          <li>Same as OPTION 4</li>
+          <li>Same as <a href="#design-option-path-keys"><b>"path-keys" field</b></a></li>
           <li>Extensible, all kinds of operations supported (add, remove, constraint)</li>
         </ul>
       </td>
       <td>
         <ul>
           <li>Not same schema as the normal policy (without D/O) - not very GWAPI-like</li>
-          <li>Poorly typed (i.e. <code>value: any)</code></li>
+          <li>Less declarative</li>
+          <li>Weakly typed (i.e. <code>value: any)</code></li>
         </ul>
       </td>
     </tr>
