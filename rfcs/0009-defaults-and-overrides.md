@@ -34,8 +34,8 @@ The base use cases for Defaults & Overrides (D/O) are:
 The base cases are expanded with the following additional derivative cases and concepts:
 - **Merged defaults (DR):** "higher" default policy rules that are merged into more specific "lower" policies (as opposed to an atomic less specific set of rules that is activated only when another more specific one is absent)
 - **Merged overrides (OR):** "higher" override policy rules that are merged into more specific "lower" policies (as opposed to an atomic less specific set of rules that is activated fully replacing another more specific one that is present)
-- **Constraints (C):** specialization of an override that, rather than declaring concrete values, specify higher level constraints for lower level values, with the semantics of a "clipping" effect over the lower level values so the latter are enforced within the boundaries/limits dictated by the constraints, in an override fashion; typically employed for constraining numeric values and regular patterns (e.g. limited sets) that are declared at the lower level (e.g., min value, max value, `in` operator)
-- **Deactivation (RR):** specialization that completes a merge default use case by allowing lower level policies to disable ("deactivate") individual defaults set a higher level (as opposed to superseding those defaults with actual, more specific, policy rules with proper meaning ther than nullify the default)
+- **Constraints (C):** specialization of an override that, rather than declaring concrete values, specify higher level constraints (e.g., min value, max value, enums) for lower level values, with the semantics of "clipping" lower level values so they are enforced, in an override fashion, to be the boundaries dictated by the constraints; typically employed for constraining numeric values and regular patterns (e.g. limited sets)
+- **Deactivation (RR):** specialization that completes a merge default use case by allowing lower level policies to disable ("deactivate") individual defaults set a higher level (as opposed to superseding those defaults with actual, more specific, policy rules with proper meaning there than nullify the default)
 
 Together, these concepts relate to solve the following user stories:
 
@@ -141,8 +141,8 @@ Similarly, a set of `overrides` policy rules could be specified, instead or alon
 ### Atomic vs. individually merged policy rules
 
 There are 2 supported strategies for applying proper Inherited Policies down to the lower levels of the herarchy:
-- **Atomic policy rules:** the bare set of policy rules in a `defaults` or `overrides` block is applied as an atomic piece; i.e., a lower object than the target of the policy, that is evaluated to be potentially affected by the policy, also has an atomic set of rules if another policy is attached to this object, therefore either the _entire_ set of rules declared by the higher (less specific) policy is taken or the _entire_ set rules declared by the lower (more specific) policy is taken (depending if it's `defaults` or `overrides`), but the two sets are never merged into one.
-- **Merged policy rules:** each _individual_ policy rule within a `defaults` or `overrides` block is compared one to one against lower level policy rules and, when they clash, either one or the other (more specific or less specific) is taken (depending if it's `defaults` or `overrides`), in a way that the final effective policy is a merge between the two policies.
+- **Atomic policy rules:** the bare set of policy rules in a `defaults` or `overrides` block is applied as an atomic piece; i.e., a lower object than the target of the policy, that is evaluated to be potentially affected by the policy, also has an atomic set of rules if another policy is attached to this object, therefore either the _entire_ set of rules declared by the higher (less specific) policy is taken or the _entire_ set of rules declared by the lower (more specific) policy is taken (depending if it's `defaults` or `overrides`), but the two sets are never merged into one.
+- **Merged policy rules:** each _individual_ policy rule within a `defaults` or `overrides` block is compared one to one against lower level policy rules and, when they conflict (i.e. have the same key with different values), either one or the other (more specific or less specific) is taken (depending if it's `defaults` or `overrides`), in a way that the final effective policy is a merge between the two policies.
 
 Each block of `defaults` and `overrides` must specify a `strategy` field whose value is set to either `atomic` or `merge`. If omitted, `atomic` is assumed.
 
@@ -150,20 +150,20 @@ Each block of `defaults` and `overrides` must specify a `strategy` field whose v
 
 Atomic versus merge strategies, as a specification of the `defaults` and `overrides` blocks, imply that there are only two levels of granularity for comparing policies _vis-a-vis_.
 
-`atomic` means that the level of granularity is the entire set of policy rules within the `defaults` or `overrides` block. I.e., the policy is atomic.
+- `atomic` means that the level of granularity is the entire set of policy rules within the `defaults` or `overrides` block. I.e., the policy is atomic, or, equivalently, the final effective policy will be either one indivisible ("atomic") set of rules ("policy") or the other.
 
-For the `merge` strategy, on the other hand, the granularity is of each _named policy rule_, where the name of the policy rule is the key and the value is an atomic object that specifies that policy rule.
+- For the `merge` strategy, on the other hand, the granularity is of each _named policy rule_, where the name of the policy rule is the key and the value is an atomic object that specifies that policy rule. The final effective policy will be a merge of two policies.
 
 #### Matrix of D/O strategies and Effective Policy
 
 When two policies are compared to compute a so-called _Effective Policy_ out of their sets of policy rules and given default or override semantics, plus specified `atomic` or `merge` strategies, the following matrix applies:
 
-|                | Atomic (entire sets of rules)                                                                                                | Merge (individual policy rules at a given granularity)                                                                                                                      |
-|----------------|------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Defaults**   | More specific _entire_ set of rules beats less specific _entire_ set of rules → takes all the rules from the _lower_ policy  | More specific _individual_ policy rules beat less specific _individual_ set of rules → compare one by one each pair of policy rules and take the _lower_ one if they clash  |
-| **Overrides**  | Less specific _entire_ set of rules beats more specific _entire_ set of rules → takes all the rules from the _higher_ policy | Less specific _individual_ policy rules beat more specific _individual_ set of rules → compare one by one each pair of policy rules and take the _higher_ one if they clash |
+|                | Atomic (entire sets of rules)                                                                                                | Merge (individual policy rules at a given granularity)                                                                                                                         |
+|----------------|------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Defaults**   | More specific _entire_ set of rules beats less specific _entire_ set of rules → takes all the rules from the _lower_ policy  | More specific _individual_ policy rules beat less specific _individual_ set of rules → compare one by one each pair of policy rules and take the _lower_ one if they conflict  |
+| **Overrides**  | Less specific _entire_ set of rules beats more specific _entire_ set of rules → takes all the rules from the _higher_ policy | Less specific _individual_ policy rules beat more specific _individual_ set of rules → compare one by one each pair of policy rules and take the _higher_ one if they conflict |
 
-The order of the policies, from less specific (or "higher") to more specific (or "lower), is determined according to the [Gateway API hierarchy of network resources](https://gateway-api.sigs.k8s.io/geps/gep-713/#hierarchy), based on the kind of the object targeted by the policy.
+The order of the policies, from less specific (or "higher") to more specific (or "lower), is determined according to the [Gateway API hierarchy of network resources](https://gateway-api.sigs.k8s.io/geps/gep-713/#hierarchy), based on the kind of the object targeted by the policy. The policy that sets higher in the hierarchy dictates the strategy to be applied.
 
 For a more detailed reference, including how to resolve conflicts in case of policies targeting objects at the same level, see GEP-713's section [Hierarchy](https://gateway-api.sigs.k8s.io/geps/gep-713/#hierarchy) and [Conflict Resolution](https://gateway-api.sigs.k8s.io/geps/gep-713/#conflict-resolution).
 
@@ -180,7 +180,7 @@ The following sets of examples generalize D/O applications for the presented [us
 | [E. Override policy rules setting constraints to other at lower level](#examples-e---override-policy-rules-setting-constraints-to-other-at-lower-level) | policy-constraints                                 |
 | [F. Policy rule that deactivates default from higher level](#examples-f---policy-rule-that-deactivates-default-from-higher-level)                       | route-disable-policy-rule                          |
 
-In all the cases, a Gateway and a HTTPRoute objects are targeted by two policies, and an effective policy is presented highlighting the expected outcome. This poses no harm to generalizations involving same or different kinds of targeted resources, multiples policies targeting a same object, etc.
+In all the examples, a Gateway and a HTTPRoute objects are targeted by two policies, and an effective policy is presented highlighting the expected outcome. This poses no harm to generalizations involving same or different kinds of targeted resources, multiples policies targeting a same object, etc.
 
 The leftmost YAML is always the "higher" (less specific) policy; the one in the middle, separated from the leftmost one by a "+" sign, is the "lower" (more specific) policy; and the rightmost YAML is the expected _Effective Policy_.
 
@@ -224,21 +224,21 @@ The examples in this section introduce the proposal for a new `when` field for t
 
 Combined with a simple case of override policy (see [Examples C](#examples-c---override-policy-entirely-replacing-other-at-lower-level)), the `when` condition field allows modeling for use cases of setting constraints for lower-level policies.
 
-As here proposed, the value of the `when` condition field must be valid [Common-Language Expression (CEL)](https://github.com/google/cel-spec) expression.
+As here proposed, the value of the `when` condition field must be a valid [Common-Language Expression (CEL)](https://github.com/google/cel-spec) expression.
 
-**Example E1.** An _override_ policy whose rules _set constraints_ to field values of other policies at a lower level, overriding individual policy values of rules with same identification if those values violate the constraints - _compliant_
+**Example E1.** An _override_ policy whose rules _set constraints_ to field values of other policies at a lower level, overriding individual policy values of rules with same identification if those values violate the constraints - _lower policy is compliant with the constraint_
 
 ![An override policy whose rules set constraints to field values of other policies at a lower level, overriding individual policy values of rules with same identification if those values violate the constraints - compliant](0009-defaults-and-overrides-assets/example-e1.png)
 
-**Example E2.** An _override_ policy whose rules _set constraints_ to field values of other policies at a lower level, overriding individual policy values of rules with same identification if those values violate the constraints - _violated_
+**Example E2.** An _override_ policy whose rules _set constraints_ to field values of other policies at a lower level, overriding individual policy values of rules with same identification if those values violate the constraints - _lower level violates the constraint_
 
 ![An override policy whose rules set constraints to field values of other policies at a lower level, overriding individual policy values of rules with same identification if those values violate the constraints - violated](0009-defaults-and-overrides-assets/example-e2.png)
 
 **Example E3.** An _override_ policy whose rules _set constraints_ to field values of other policies at a lower level, overriding individual policy values of rules with same identification if those values violate the constraints - _merge granularity problem_
 
-The following example illustrates the possibly unintended consequences of enforcing D/O at [strict levels of granularity](#level-of-granularity-of-compared-policy-rules), and the flip side of the `strategy` field offering a closed set of options (`atomic` vs `merge`).
+The following example illustrates the possibly unintended consequences of enforcing D/O at [strict levels of granularity](#level-of-granularity-of-compared-policy-rules), and the flip side of the `strategy` field offering a closed set of options (`atomic`, `merge`).
 
-On one hand, the API is simple and straightforward, and there are no deeper side effects to be concerned about, other than at the two levels provided (entire set or atomic values for each individual policy rule.) On the other hand, this design may require more offline interaction between the actors who manage conflicting policies.
+On one hand, the API is simple and straightforward, and there are no deeper side effects to be concerned about, other than at the two levels provided (atomic sets or merged individual policy rules.) On the other hand, this design may require more offline interaction between the actors who manage conflicting policies.
 
 ![An override policy whose rules set constraints to field values of other policies at a lower level, overriding individual policy values of rules with same identification if those values violate the constraints - merge granularity problem](0009-defaults-and-overrides-assets/example-e3.png)
 
@@ -421,7 +421,7 @@ spec:
 
 ## API DESIGN 4 - “path-keys”
 
-A more radical alternative considered consisted of defining `defaults` and `overrides` blocks whose schemas would not match the ones of a normal policy without D/O. Instead, these blocks would consist of simple key-value pairs, where the keys specify the paths in an affected policy where to apply an atomic value.
+A more radical alternative considered consisted of defining `defaults` and `overrides` blocks whose schemas would not match the ones of a normal policy without D/O. Instead, these blocks would consist of simple key-value pairs, where the keys specify the paths in an affected policy where to apply the value atomically.
 
 Example:
 
@@ -468,7 +468,7 @@ spec:
 
 ## API DESIGN 5 - JSON patch-like
 
-Similar to [DESIGN 4](#api-design-4---path-keys) and inspired by [JSON patch](https://jsonpatch.com/)-like operations.
+Similar to [DESIGN 4](#api-design-4---path-keys), inspired by [JSON patch](https://jsonpatch.com/) operations, to provide more kinds of operations and extensibility.
 
 Example:
 
@@ -534,7 +534,7 @@ A typical generic policy requirement user story is:
 
 Policy requirements as here described are out of scope of this RFC.
 
-We believe policy requirement use cases can be stated and solved as an observability problem, by defining metrics and alerts that cover for missing policies or policy rules, without necessarily having to write a policy of the same kind to express such requirement tobe fulfilled.
+We believe policy requirement use cases can be stated and solved as an observability problem, by defining metrics and alerts that cover for missing policies or policy rules, without necessarily having to write a policy of the same kind to express such requirement to be fulfilled.
 
 # Unresolved questions
 [unresolved-questions]: #unresolved-questions
