@@ -18,9 +18,11 @@ As of Kuadrant Operator [v0.6.0](https://github.com/Kuadrant/kuadrant-operator/r
 The above is notably the case of the AuthPolicy and the RateLimitPolicy v1beta2 APIs, shipped with the aforementioned version of Kuadrant. These kinds of policies can be attached to Gateways or to HTTPRoutes, with cascading effects through the hierarchy that result in one _effective policy_ per gateway-route combination. This effective policy is either the policy attached to the Gateway or, if present, the one attached to the HTTRoute, thus conforming with a strict case of _implicit defaults set at the level of the gateway_.
 
 Enhancing the Kuadrant Inherited Policy CRDs, so the corresponding policy instances can declare `defaults` and `overrides` stanzas, is imperative:
-1. to provide full support for D/O in the terms proposed at [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713) of the Kubernetes Gateway API special group (base use cases);
+1. to provide full support for D/O along the lines proposed by [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713) (to be superseded by [GEP-2649](https://github.com/kubernetes-sigs/gateway-api/pull/2813)[^1]) of the Kubernetes Gateway API special group (base use cases);
 2. to extend D/O support to other derivative cases, learnt to be just as important for platform engineers and app developers who require more granular policy interaction on top of the base cases;
 3. to support more sophisticated hierarchies with other kinds of network objects and/or multiples policies targetting at the same level of the hierarchy (possibly, in the future.)
+
+[^1]: As the time of writing, [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713) (Kubernetes Gateway API, SIG-NETWORK) is [under revision](https://github.com/kubernetes-sigs/gateway-api/pull/2813), expected to be split into two separate GEPs, one for Direct Policies (GEP-2648) and one for Inherited Policies (GEP-2649.) Once these new GEPs supersede GEP-713, all references to the previous GEP in this document must be updated to GEP-2649.
 
 # Guide-level explanation
 [guide-level-explanation]: #guide-level-explanation
@@ -82,19 +84,55 @@ Supporting specifying the bare set of policy rules at the first level of the spe
 1. more natural usability, especially for those who write policies attached to the lowest level of the hierarchy supported; as well as
 2. backward compatibility for policies that did not support explicit D/O and later on have moved to doing so.
 
-### Direct Policies
+### Inherited Policies that _declare an intent_
 
 A policy that does not specify D/O fields (`defaults`, `overrides`) is a policy that _declares an intent_.
 
-When a policy of such kind targets an object whose kind is the lowest kind accepted by Kuadrant in the hierarchy of network resources, such policy is treated as a [_Direct Policy_](https://gateway-api.sigs.k8s.io/geps/gep-713/#direct-policy-attachment). When, otherwise, it is used to target "higher" objects, the policy is treated as an Inherited Policy that implicitly declares atomic _defaults_.
+One who writes a policy without specifying `defaults` or `overrides`, but only the bare set of policy rules, may feel like declaring a [_Direct Policy_](https://gateway-api.sigs.k8s.io/geps/gep-713/#direct-policy-attachment).
+Depending on the state of other policies indirectly affecting the same object or not, the final outcome can be the same as writing a direct policy.
+This is especially true when the policy that declares the intent targets an object whose kind is the lowest kind accepted by Kuadrant in the hierarchy of network resources, and there are no other policies with lower precedence.
 
-### Inherited Policies
+Nevertheless, because other policies can affect the final behavior of the target (e.g. by injecting defaults, by overriding rules, by adding more definitions beneath), policies that simply declare an intent, conceptually, are still Inherited Policies.
 
-A policy that specifies D/O fields (`defaults`, `overrides`) is a policy explicitly declared to _modify an intent_ (or a _proper Inherited Policy_.)
+Compared to the inherited policy that misses D/O blocks, these other policies affecting the behavior may be declared:
+- at higher levels in the hierarchy,
+- at lower levels in hierarchy, or even
+- at the same level in the hierarchy but happening to have lower precedence (if such case is allowed by the kind of policy.)
 
-There is no meaning in declaring a proper Inherited Policy that targets an object whose kind is the lowest kind accepted by Kuadrant in the hierarchy of network resources. The sets of rules specified in these policies affect indistinctively the targeted objects, whether the rules are qualified as `defaults` or as `overrides`.
+At any time, any one of these policies can be created and therefore the final behavior of a target should never be assumed to be equivalent to the intent declared by any individual policy in particular, but always collectively determined by the combination of all intents, defaults and overrides from all inherited policies affecting the target.
 
-### Example of D/O-enabled Kuadrant policy
+From [GEP-2649](https://github.com/kubernetes-sigs/gateway-api/pull/2813):
+
+> If a Policy can be used as an Inherited Policy, it MUST be treated as an Inherited Policy, regardless of whether a specific instance of the Policy is only affecting a single object.
+
+An inherited policy that simply declares an intent (i.e. without specifying D/O) will be treated as a policy that implicitly declares an atomic set of _defaults_, whether the policy targets higher levels in the hierarchy or lower ones.
+In the absence of any other conflicting policy affecting the same target, the _behavior_ equals the _defaults_ which equal the _intent_.
+
+### Inherited Policies that _modify an intent_
+
+A policy that specifies D/O fields (`defaults`, `overrides`) is a policy explicitly declared to _modify an intent_.
+
+Without any other policy with lower precedence, there is no special meaning in choosing whether _defaults_ or _overrides_ in a inherited policy that targets an object whose kind is the lowest kind accepted by Kuadrant in the hierarchy of network resources.
+The sets of rules specified in these policies affect indistinctively the targeted objects, regardless of how they are qualified.
+
+However, because other policies may ocasionally be declared with lower precedence (i.e. targeting lower levels in the hierarchy or due to ordering, see [Conflict Resolution](https://gateway-api.sigs.k8s.io/geps/gep-713/#conflict-resolution)), one who declares a policy to modify an intent must carefuly choose between `defaults` and/or `overrides` blocks to organize the policy rules, regardless if the targeted object is of a kind that is the lowest kind in the hierarchy of network resources accepted by Kuadrant.
+
+Even in the cases where no more than one policy of a kind is allowed to target a same object (1:1 relationship) and thus there should never exist two policies affecting a target from a same level of the hierarchy simultaneaously (or equivalently a policy with lower precedence than another, both at the lowest level of the hierarchy), users must assume that this constraint may change (i.e. N:1 relationship between policies of a kind and target become allowed.)
+
+In all cases, _defaults_ and _overrides_ must be used with the semantics of declaring rules that modify an intent.
+- When an intent does not specify a rule for which there is a higher default declared, the default modifies the intent by setting the value specified by the default.
+- For an intent that whether specifies or omits a rule for which there is a higher override declared, the override modifies the intent by setting the value specified by the override.
+
+### Identifying inherited policy kinds
+
+All Custom Resource Definitions (CRDs) that define a Kuadrant inherited policy must be labeled `gateway.networking.k8s.io/policy: inherited`.
+
+Users can rely on the presence of that label to identify policy kinds whose instances are treated as inhertied policies.
+
+In some exceptional cases, there may be kinds of Kuadrant policies that do not specify `defaults` and `overrides` blocks, but that are still labeled as inherited policy kinds.
+Instances of these kinds of policies implicitly declare an atomic sets of _defaults_, similarly to described in [Inherited Policies that declare an intent](#inherited-policies-that-declare-an-intent).
+
+### Examples of D/O-enabled Kuadrant policy
 
 **Example 1.** Atomic defaults
 
