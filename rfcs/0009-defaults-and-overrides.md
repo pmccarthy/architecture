@@ -400,6 +400,34 @@ flowchart LR
     merge-override-block-into-p-finish
 ```
 
+## Implementation tiers
+
+This section proposes a possible path for the implementation of this RFC for Kuadrant's existing kinds of policies that are affected by D/O – notably AuthPolicy and RateLimitPolicy.
+
+The path is divided in 3 tiers that could be delivered in steps, additionaly to a series of enhancements & refactoring.
+
+### Tier 1
+
+- Atomic defaults (currently supported; missing addition of the `defaults` field to the APIs)
+- Atomic overrides
+- Reporting of effective policy
+- CRD labels `gateway.networking.k8s.io/policy: inherited | direct`
+
+### Tier 2
+
+- D/O `when` conditions (and support for "constraints")
+- Merge strategy
+
+### Tier 3
+
+- Deactivations
+- Metrics for D/O policies (control plane)
+- Docs: possible approaches for ["requirements"](#policy-requirements)
+
+### Enhancements and refactoring
+
+- Extract generic part of D/O implementation to [Kuadrant/gateway-api-machinery](https://github.com/Kuadrant/gateway-api-machinery).
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
