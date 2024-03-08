@@ -295,7 +295,109 @@ The examples in this section introduce a new field `remove: []string` at the sam
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
 
-WIP
+## Applying policies
+
+The following diagrams are a high level model to guide the process of applying a set of policies of a kind for a given Gateway object, where the Gateway object is considered the root of a hierarchy, and for all objects beneath, being the xRoute objects the leaves of the hierarchical tree.
+
+As presented, policies can target either Gateways of route objects (HTTPRoutes, GRPCRoutes), with no restriction regarding the number of policies of a kind that target a same particular object. I.e. N:1 relationship allowed. Without any loss of generality, 1:1 relationship between policies of a kind and targeted objects can be imposed if preferred as a measure to initially reduce the blast of information for the user and corresponding cognitive load.
+
+### Apply policies to a Gateway (root object) and all objects beneath
+
+```mermaid
+%%{ init: { "theme": "neutral" } }%%
+flowchart LR
+    start([For a Gateway <i>g</i><br>and policy kind <i>pk</i>]) -->
+    list-routes[List all routes<br>accepted by <i>g</i> as <i>R</i>] -->
+    apply-policies-for-r
+    subgraph for-each-route[For each <i>r in R</i>]
+        apply-policies-for-r[[Apply policies<br>of kind <i>pk</i><br>scoped for <i>r</i>]] -->
+        apply-policies-for-r
+    end
+    for-each-route -->
+    build-virtual-route[Build a virtual route <i>vr</i><br>with all route rules not<br>target by any policy] -->
+    apply-policies-for-vr[[Apply policies<br>of kind <i>pk</i><br>scoped for <i>vr</i>]] -->
+    finish(((END)))
+```
+
+### Apply policies of a kind for an object
+
+```mermaid
+%%{ init: { "theme": "neutral" } }%%
+flowchart LR
+    apply-policies-for-o-start([Apply policies of kind <i>pk</i><br>scoped for an object <i>o</i>]) -->
+    list-policies[Make <i>P</i> ← all policies <br>of kind <i>pk</i> that<br>affect <i>o</i>] -->
+    sort-policies[Sort <i>P</i> from<br>lowest to highest] -->
+    build-effective-policy[Build an effective<br>policy <i>ep</i> without<br>any policy rules] -->
+    merge-p-into-ep
+    subgraph for-each-policy[For each policy <i>p in P</i>]
+        merge-p-into-ep[[Merge <i>p into <i>ep</i>]] -->
+        merge-p-into-ep
+    end
+    for-each-policy -->
+    reconcile-ep[Reconcile resources<br>for <i>ep</i>] -->
+    apply-policies-for-o-finish(((END)))
+```
+
+### Merging two policies together
+
+```mermaid
+%%{ init: { "theme": "neutral" } }%%
+flowchart LR
+    merge-p1-into-p2-start([Merge policy <i>p1</i><br>into policy <i>p2</i>]) -->
+    merge-defaults-for-r[["Merge <b>defaults</b> block<br>of policy rules<br>of <i>p1</i> into <i>p2</i>"]] -->
+    merge-bare-rules-for-r[["Merge ungrouped block<br>of policy rules<br>of <i>p1</i> into <i>p2</i><br>(as <b>defaults</b>)"]] -->
+    merge-overrides-for-r[["Merge <b>overrides</b> block<br>of policy rules<br>of <i>p1</i> into <i>p2</i>"]] -->
+    merge-p1-into-p2-finish(((Return <i>p2</i>)))
+```
+
+### Merging a generic block of policy rules (defaults or overrides) into a policy with conditions
+
+```mermaid
+%%{ init: { "theme": "neutral" } }%%
+flowchart LR
+    merge-block-of-rules-into-p-start([Merge block of<br>policy rules <i>B</i><br>into policy <i>p</i>]) -->
+    r-conditions-match{"<i>B.when(p)</i>"}
+    r-conditions-match -- "Conditions do not match" --> merge-block-of-rules-into-p-finish(((Return <i>p</i>)))
+    r-conditions-match -- "Conditions match" --> block-semantics{Merge <i>B</i> as}
+    block-semantics -- "Defaults" --> merge-default-block-into-p[[Merge default block<br>of policy rules <i>B</i><br>into policy <i>p</i>]] --> merge-block-of-rules-into-p-finish
+    block-semantics -- "Overrides" --> merge-override-block-into-p[[Merge override block<br>of policy rules <i>B</i><br>into policy <i>p</i>]] --> merge-block-of-rules-into-p-finish
+```
+
+### Merge a `defaults` block of policy rules into a policy
+
+```mermaid
+%%{ init: { "theme": "neutral" } }%%
+flowchart LR
+    merge-default-block-into-p-start([Merge default block<br>of policy rules <i>B</i><br>into policy <i>p</i>]) -->
+    p-empty{<i>p.empty?</i>}
+    p-empty -- "Yes" --> full-replace-p-with-defaut-block[<i>p.rules ← B</i>] --> merge-default-block-into-p-finish(((Return <i>p</i>)))
+    p-empty -- "No" --> default-block-strategy{<i>B.strategy</i>}
+    default-block-strategy -- "Atomic" --> merge-default-block-into-p-finish
+    default-block-strategy -- "Merge" --> default-p-r-exists
+    subgraph for-each-default-policy-rule["For each <i>r in B<i>"]
+        default-p-r-exists{"<i>p[r.id].exists?</i>"}
+        default-p-r-exists -- "Yes" --> default-p-r-exists
+        default-p-r-exists -- "No" --> default-replace-pr["<i>p[r.id] ← r</i>"] --> default-p-r-exists
+    end
+    for-each-default-policy-rule -->
+    merge-default-block-into-p-finish
+```
+
+### Merge an `overrides` block of policy rules into a policy
+
+```mermaid
+%%{ init: { "theme": "neutral" } }%%
+flowchart LR
+    merge-override-block-into-p-start([Merge override block<br>of policy rules <i>B</i><br>into policy <i>p</i>]) -->
+    override-block-strategy{<i>B.strategy</i>}
+    override-block-strategy -- "Atomic" --> full-replace-p-with-override-block[<i>p.rules ← B</i>] --> merge-override-block-into-p-finish(((Return <i>p</i>)))
+    override-block-strategy -- "Merge" --> override-replace-pr
+    subgraph for-each-override-policy-rule["For each <i>r in B<i>"]
+        override-replace-pr["<i>p[r.id] ← r</i>"] --> override-replace-pr
+    end
+    for-each-override-policy-rule -->
+    merge-override-block-into-p-finish
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
