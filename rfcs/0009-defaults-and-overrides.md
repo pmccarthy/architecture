@@ -369,6 +369,7 @@ flowchart LR
 %%{ init: { "theme": "neutral" } }%%
 flowchart LR
     merge-default-block-into-p-start([Merge default block<br>of policy rules <i>B</i><br>into policy <i>p</i>]) -->
+    remove-unwanted-policy-rules[Remove from <i>B</i><br>all policy rules<br>listed in <i>p.remove</i>] -->
     p-empty{<i>p.empty?</i>}
     p-empty -- "Yes" --> full-replace-p-with-defaut-block[<i>p.rules ← B</i>] --> merge-default-block-into-p-finish(((Return <i>p</i>)))
     p-empty -- "No" --> default-block-strategy{<i>B.strategy</i>}
