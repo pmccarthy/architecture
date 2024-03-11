@@ -8,7 +8,7 @@
 # Summary
 [summary]: #summary
 
-This is a proposal for extending the Kuadrant Policy APIs to fully support use cases of **Defaults & Overrides (D/O)** for [Inherited Policies](https://gateway-api.sigs.k8s.io/geps/gep-713/#inherited-policy-attachment-its-all-about-the-defaults-and-overrides), including the base use cases of _full default_ and _full override_, and more specific nuances that involve merging individual policy rules (as defaults or overrides), declaring constraints and deactivating defaults.
+This is a proposal for extending the Kuadrant Policy APIs to fully support use cases of **Defaults & Overrides (D/O)** for [Inherited Policies](https://gateway-api.sigs.k8s.io/geps/gep-713/#inherited-policy-attachment-its-all-about-the-defaults-and-overrides), including the base use cases of _full default_ and _full override_, and more specific nuances that involve merging individual policy rules (as defaults or overrides), declaring constraints and unsetting defaults.
 
 # Motivation
 [motivation]: #motivation
@@ -37,7 +37,7 @@ The base cases are expanded with the following additional derivative cases and c
 - **Merged defaults (DR):** "higher" default policy rules that are merged into more specific "lower" policies (as opposed to an atomic less specific set of rules that is activated only when another more specific one is absent)
 - **Merged overrides (OR):** "higher" override policy rules that are merged into more specific "lower" policies (as opposed to an atomic less specific set of rules that is activated fully replacing another more specific one that is present)
 - **Constraints (C):** specialization of an override that, rather than declaring concrete values, specify higher level constraints (e.g., min value, max value, enums) for lower level values, with the semantics of "clipping" lower level values so they are enforced, in an override fashion, to be the boundaries dictated by the constraints; typically employed for constraining numeric values and regular patterns (e.g. limited sets)
-- **Deactivation (RR):** specialization that completes a merge default use case by allowing lower level policies to disable ("deactivate") individual defaults set a higher level (as opposed to superseding those defaults with actual, more specific, policy rules with proper meaning there than nullify the default)
+- **Unsetting (U):** specialization that completes a merge default use case by allowing lower level policies to disable ("unset") individual defaults set a higher level (as opposed to superseding those defaults with actual, more specific, policy rules with proper meaning)
 
 Together, these concepts relate to solve the following user stories:
 
@@ -50,7 +50,7 @@ Together, these concepts relate to solve the following user stories:
 | As a Platform Engineer, when configuring a Gateway, I want to set policy rules (parts of a policy) for all routes linked to my Gateway, that cannot be individually replaced by more specific ones(*), but only expanded with additional more specific rules(\*).                                   | OR    | **gateway-override-policy-rule** |
 | As an Application Developer, when managing an application, I want to set a policy for my application, that fully replaces any default policy that may exist for the application at the level of the Gateway, without having to know about the existence of the default policy.                      | D     | **route-replace-policy**         |
 | As an Application Developer, when managing an application, I want to expand a default set of policy rules set for my application at the level of the gateway, without having to refer to those existing rules by name.                                                                              | D/O   | **route-add-policy-rule**        |
-| As an Application Developer, when managing an application, I want to deactivate an individual default rule set for my application at the level of the gateway.                                                                                                                                      | RR    | **route-disable-policy-rule**    |
+| As an Application Developer, when managing an application, I want to unset an individual default rule set for my application at the level of the gateway.                                                                                                                                           | U     | **route-unset-policy-rule**      |
 
 <sup>(*) declared in the past or in the future, by myself or any other authorized user.</sup>
 
@@ -205,9 +205,25 @@ The order of the policies, from less specific (or "higher") to more specific (or
 
 For a more detailed reference, including how to resolve conflicts in case of policies targeting objects at the same level, see GEP-713's section [Hierarchy](https://gateway-api.sigs.k8s.io/geps/gep-713/#hierarchy) and [Conflict Resolution](https://gateway-api.sigs.k8s.io/geps/gep-713/#conflict-resolution).
 
+### Unsetting inherited defaults
+
+In some cases, it may be desirable to be able to unset, at a lower policy, a merged default that is inherited from a higher one. In fact, some inherited defaults could be harmful to an application, at the same time as they are unfeasible to remove from scope for all applications altogether, and therefore require an exception.
+
+Unsetting defaults via specification at lower level policies provides users who own policy rules at different levels of the hirarchy the option of not having to coordinate those exceptions "offline", nor having to accept the addition of special cases (conditions) _at the higher level_ to exempt only specific lower policies from being affected by a particular default, which otherwise would configure a violation of the inheritance pattern, as well as an imposition of additional cognitive complexity for one who reads a higher policy with too many conditions.
+
+Instead, users should continue to be able to declare their intents through policies, and redeem an entitlement to unset unapplicable defaults, without any leakage of lower level details upwards at the higher policies.
+
+The option of unsetting inherited defaults is presented as part of the volition implied by the inheritance of policy rules, which are tipically specified for the more general case (e.g. at the level of a gateway, for all routes), though not necessarily applicable for all special cases beneath. If enabled, this feature helps disambiguate the concept of "default", which should not be understood strictly as the option to set values that protect the system in case of lack of specialisation. Rather, by its property of volition and changeability. I.e., by definition, **every default policy rule is opt-out and specifies a value that is modifiable**.
+
+In constrast, a policy rule that is neither opt-out nor modifiable better fits the definition of an _override_. While a policy rule that is not opt-out, nor it sets a concrete default value to be enforced in the lack of specialisation, defines a [_requirement_](#policy-requirements).
+
+Finally, for the use case where users want to set defaults that cannot be unset (though still modifable), the very feature of unsetting defaults itself should be configurable, at least at the level of the system. This can be achieved with feature switches and policy validation, including backed by the cluster's RBAC if needed.
+
+The capability of unsetting inherited defaults from an effective policy can be identified by the presence of the `spec.unset` field in a policy. The value is a list of default named policy rules to be unset.
+
 ## Examples of D/O cases
 
-The following sets of examples generalize D/O applications for the presented [user stories](#conceptialization-and-user-story), regardless of details about specific personas and kinds of targeted resources. They illustrate the expected behavior for different cases involving defaults, overrides, constraints and deactivations.
+The following sets of examples generalize D/O applications for the presented [user stories](#conceptialization-and-user-story), regardless of details about specific personas and kinds of targeted resources. They illustrate the expected behavior for different cases involving defaults, overrides, constraints and unsetting.
 
 | Examples                                                                                                                                                | Highlighted user stories                           |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|
@@ -216,7 +232,7 @@ The following sets of examples generalize D/O applications for the presented [us
 | [C. Override policy entirely replacing other at lower level](#examples-c---override-policy-entirely-replacing-other-at-lower-level)                     | gateway-override-policy                            |
 | [D. Override policy rules merged into other at lower level](#examples-d---override-policy-rules-merged-into-other-at-lower-level)                       | gateway-override-policy-rule                       |
 | [E. Override policy rules setting constraints to other at lower level](#examples-e---override-policy-rules-setting-constraints-to-other-at-lower-level) | policy-constraints                                 |
-| [F. Policy rule that deactivates default from higher level](#examples-f---policy-rule-that-deactivates-default-from-higher-level)                       | route-disable-policy-rule                          |
+| [F. Policy rule that unsets a default from higher level](#examples-f---policy-rule-that-unsets-a-default-from-higher-level)                             | route-unset-policy-rule                            |
 
 In all the examples, a Gateway and a HTTPRoute objects are targeted by two policies, and an effective policy is presented highlighting the expected outcome. This poses no harm to generalizations involving same or different kinds of targeted resources, multiples policies targeting a same object, etc.
 
@@ -232,13 +248,13 @@ For a complete reference of the order of hierarchy, from least specific to most 
 
 ### Examples B - Default policy rules merged into policies at lower level
 
-**Example B1.** A _default_ policy whose rules are _merged into other policies_ at a lower level, where individual default policy rules can be overridden or deactivated - _without conflict_
+**Example B1.** A _default_ policy whose rules are _merged into other policies_ at a lower level, where individual default policy rules can be overridden or unset - _without conflict_
 
-![A default policy whose rules are merged into other policies at a lower level, where individual default policy rules can be overridden or deactivated - without conflict](0009-defaults-and-overrides-assets/example-b1.png)
+![A default policy whose rules are merged into other policies at a lower level, where individual default policy rules can be overridden or unset - without conflict](0009-defaults-and-overrides-assets/example-b1.png)
 
-**Example B2.** A _default_ policy whose rules are _merged into other policies_ at a lower level, where individual default policy rules can be overridden or deactivated - _with conflict_
+**Example B2.** A _default_ policy whose rules are _merged into other policies_ at a lower level, where individual default policy rules can be overridden or unset - _with conflict_
 
-![A default policy whose rules are merged into other policies at a lower level, where individual default policy rules can be overridden or deactivated - with conflict](0009-defaults-and-overrides-assets/example-b2.png)
+![A default policy whose rules are merged into other policies at a lower level, where individual default policy rules can be overridden or unset - with conflict](0009-defaults-and-overrides-assets/example-b2.png)
 
 ### Examples C - Override policy entirely replacing other at lower level
 
@@ -280,17 +296,17 @@ On one hand, the API is simple and straightforward, and there are no deeper side
 
 ![An override policy whose rules set constraints to field values of other policies at a lower level, overriding individual policy values of rules with same identification if those values violate the constraints - merge granularity problem](0009-defaults-and-overrides-assets/example-e3.png)
 
-### Examples F - Policy rule that deactivates default from higher level
+### Examples F - Policy rule that unsets a default from higher level
 
-The examples in this section introduce a new field `remove: []string` at the same level as the bare set of policy rules. The value of this field, provided as a list, dictates the default policy rules declared at a higher level to be deactivated ("removed") from the effective policy, specified by name of the policy rules.
+The examples in this section introduce a new field `unset: []string` at the same level as the bare set of policy rules. The value of this field, provided as a list, dictates the default policy rules declared at a higher level to be removed ("unset") from the effective policy, specified by name of the policy rules.
 
-**Example F1.** A policy that _deactivates_ a _default_ policy rule set at a higher level
+**Example F1.** A policy that _unsets_ a _default_ policy rule set at a higher level
 
-![A policy that deactivates a default policy rule set at a higher level](0009-defaults-and-overrides-assets/example-f1.png)
+![A policy that unsets a default policy rule set at a higher level](0009-defaults-and-overrides-assets/example-f1.png)
 
-**Example F2.** A policy that tries to _deactivate_ an _override_ policy rule set a higher level
+**Example F2.** A policy that tries to _unset_ an _override_ policy rule set a higher level
 
-![A policy that tries to deactivate an override policy rule set a higher level](0009-defaults-and-overrides-assets/example-f2.png)
+![A policy that tries to unset an override policy rule set a higher level](0009-defaults-and-overrides-assets/example-f2.png)
 
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
@@ -369,7 +385,7 @@ flowchart LR
 %%{ init: { "theme": "neutral" } }%%
 flowchart LR
     merge-default-block-into-p-start([Merge default block<br>of policy rules <i>B</i><br>into policy <i>p</i>]) -->
-    remove-unwanted-policy-rules[Remove from <i>B</i><br>all policy rules<br>listed in <i>p.remove</i>] -->
+    unset-unwanted-policy-rules[Remove from <i>B</i><br>all policy rules<br>listed in <i>p.unset</i>] -->
     p-empty{<i>p.empty?</i>}
     p-empty -- "Yes" --> full-replace-p-with-defaut-block[<i>p.rules ← B</i>] --> merge-default-block-into-p-finish(((Return <i>p</i>)))
     p-empty -- "No" --> default-block-strategy{<i>B.strategy</i>}
@@ -420,7 +436,7 @@ The path is divided in 3 tiers that could be delivered in steps, additionaly to 
 
 ### Tier 3
 
-- Deactivations
+- Unsetting (`unset`)
 - Metrics for D/O policies (control plane)
 - Docs: possible approaches for ["requirements"](#policy-requirements)
 
@@ -471,7 +487,7 @@ Some of the implications of the design are explained in the section [Atomic vs. 
           <li>Declarative</li>
           <li>Safe against "unmergeable objects" (e.g. two rules declaring different one-of options)</li>
           <li>Strong types</li>
-          <li>Extensible (by adding more fields, e.g.: to support deactivations)</li>
+          <li>Extensible (by adding more fields, e.g.: to support unsetting defaults)</li>
           <li>Easy to learn</li>
         </ul>
       </td>
