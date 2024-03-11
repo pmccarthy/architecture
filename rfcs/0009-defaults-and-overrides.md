@@ -221,6 +221,18 @@ Finally, for the use case where users want to set defaults that cannot be unset 
 
 The capability of unsetting inherited defaults from an effective policy can be identified by the presence of the `spec.unset` field in a policy. The value is a list of default named policy rules to be unset.
 
+### Conditionally applying D/O
+
+Users should be able to specify conditions for applying their blocks of `defaults` and `overrides`. These conditions aim to support exceptional cases where the blocks cannot be simply applied downwards, but rather depend on specifics found in the lower policies, while still defined in generic terms – as opposed to conditions that leak details of individual lower policies upwards.
+
+Between a higher and a lower set of policy rules, the higher level dictates the conditions for its rules to be applied (either as defaults or as overrides) over the lower level, and never the other way around.
+
+D/O conditions are identfied by the presence of the `spec.defaults.when` or `spec.overrides.when` fields in a policy. Those should be defined using [Common Expression Language (CEL)](https://github.com/google/cel-spec), evaluated in the control plane against the lower level specification that the higher level is being applied to. I.e. `self` in the CEL expression is the lower policy.
+
+A concrete useful application for conditionally enforcing a block of D/O is for specifying _constraints_ for lower values. E.g. if a lower policy tries to set a value on a numeric field that is greater (or lower) than a given threshold, apply an override that sets that field value to equal to the threshold; otherwise, use the value declared by the lower policy.
+
+In contrast, an example of trivially redundant application of D/O conditions would be specifying a default block of rules that is only applied when the lower level does not declare a more specific replacement. Since this is natural semantics of a default, one does not have to use conditions for that.
+
 ## Examples of D/O cases
 
 The following sets of examples generalize D/O applications for the presented [user stories](#conceptialization-and-user-story), regardless of details about specific personas and kinds of targeted resources. They illustrate the expected behavior for different cases involving defaults, overrides, constraints and unsetting.
