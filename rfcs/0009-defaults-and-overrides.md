@@ -459,7 +459,7 @@ The path is divided in 3 tiers that could be delivered in steps, additionaly to 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-WIP
+See _Mutually exclusive API designs > [Design option: `strategy` field](#design-option-strategy-field)_.
 
 # Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
@@ -778,7 +778,11 @@ spec:
 # Prior art
 [prior-art]: #prior-art
 
-WIP
+Other than the primitive support only for implicit atomic defaults provided by Kuadrant for the AuthPolicy and RateLimitPolicy, other real-life implementations of D/O along the lines proposed by Gateway API are currently unknown.
+
+Some orientative examples provided in:
+- [GEP-2649](https://github.com/kubernetes-sigs/gateway-api/pull/2813) - search for "CDNCachingPolicy" as well as "Merging into existing spec fields";
+- [`gwctl`](https://github.com/kubernetes-sigs/gateway-api/tree/v1.0.0/gwctl) effective policy calculation for inherited policies - see [policy manager's merge test cases](https://github.com/kubernetes-sigs/gateway-api/blob/v1.0.0/gwctl/pkg/policymanager/merger_test.go).
 
 # Out of scope
 
@@ -797,9 +801,85 @@ We believe policy requirement use cases can be stated and solved as an observabi
 # Unresolved questions
 [unresolved-questions]: #unresolved-questions
 
-WIP
+## Policy spec resembling more the target spec
+
+**Should Kuadrant's inherited policy specs resemble more the specs of the objects they target?**
+
+The UX for one who writes a Kuadrant policy of the inherited class of policies is arguably not very different from writing any custom resource that happens to specify a `targetRef` field.
+Other than name and kind of target object, there is nothing much in a Kuadrant policy custom resource that provides the user with an experience almost close to be "adding fields" in the target object.
+
+With the exception of a few types reused for the [route selectors](https://docs.kuadrant.io/kuadrant-operator/doc/reference/route-selectors/), the spec of a Kuadrant policy is very different from the spec of the object that ultimately the policy augments, i.e. the spec of the route object. This remains basically unchanged after this RFC. However, another way to think on the design of those APIs is one where, in contrast, the specs of the policies partially mirror the spec of the route, so users can write policies in a more intuitive fashion, as if the definitions of the policy would look like extensions of the routes they target (directly or by targeting gateways the routes are attached to.)
+
+E.g.:
+
+```yaml
+kind: HTTPRoute
+metadata:
+  name: my-route
+spec:
+  rules:
+  - name: rule-1
+    matches:
+    - method: GET
+    backendRef: {…}
+  - name: rule-2
+    backendRef: {…}
+```
+
+An inherited policy that targets the HTTPRoute above could otherwise look like the following:
+
+```yaml
+kind: Policy
+metadata:
+  name: my-policy
+spec:
+  targetRef:
+    kind: HTTPRoute
+    name: my-route
+  defaults: # mirrors the spec of the httproute object
+    policySpecificDef: {…} # augments the entire httproute object
+  overrides: # mirrors the spec of the httproute object
+    rules:
+    - name: rule-2
+      policySpecificDef: {…} # augments only httprouterule rule-2 of the httproute object
+```
+
+The above already is somewhat closer to being true for the AuthPolicy API, than it is for the RateLimitPolicy one. However, that is strictly coincidental, because the AuthPolicy's spec happens to specify a `rules` field, where the equivalent at the same level in RateLimitPolicy is called `limits`.
+
+This alternative design could make writing policies more like defining filters in an HTTPRoute, with the difference that policies are external to the target they extend (while filters are internal.) At the same time, it could be a replacement for Kuadrant route selectors, where the context of applicability of a policy rule is given by the very structure within the spec how the policy rule is declared (resembling the one of the target), thus also would shaping context for D/O.
+
+One caveat of this design though is that each policy specific definition (i.e. the rule specification that extends the object at a given point defined by the very structure of the spec) is exclusive of that given point in the structure of the object. I.e., one cannot specify a single policy rule that augments N > 1 specific rules of a target HTTPRoute.
+
+Due to its relevance to the design of the API that enables D/O, this was left as an unresolved question. To be nonetheless noticed that, as a pattern, this alternative API design extends beyond inherited policies, impacting as well the direct policy kinds DNSPolicy and TLSPolicy.
 
 # Future possibilities
 [future-possibilities]: #future-possibilities
 
-WIP
+## N:1 policy-target relationship
+
+Although this proposal was thought to keep options open for multiple policies of a kind targeting a same network resource, this is currently not the state of things for Kuadrant. Instead, Kuadrant enforces 1:1 relationship between policies of a kind and target resources.
+
+Supporting N:1 relationships could enable use cases such as of App Developers defining D/O for each other at the same level of a shared xRoute, as well as Platform Engineers setting different policy rules on the same Gateway.
+
+This could provide an alternative to achieving separation of concerns for complex policy kinds such as the AuthPolicy, where different users could be resonsible for authentication and authorization, without necessariyl depending on defining new kinds of policies.
+
+## Route rule `name` and `targetRef.sectionName`
+
+If Gateway API's [GEP-995](https://github.com/kubernetes-sigs/gateway-api/issues/995) is accepted (i.e. [kubernetes-sigs/gateway-api#2593](https://github.com/kubernetes-sigs/gateway-api/pull/2593) gets merged) and the `name` field for route rules implemented in the APIs (HTTPRoute and GRPCRoute), this could impact how Kuadrant delivers D/O. Although the semantics could remain the same, the users specify the scope for a given set of policy rules could simplify significantly.
+
+As of today, Kuadrant's AuthPolicy and RateLimitPolicy APIs allow users to target sections of a HTTPRoute based on [route selectors](https://docs.kuadrant.io/kuadrant-operator/doc/reference/route-selectors/), and thus all the conflict resolution involved in handling D/O must take that logics into account.
+
+With named route rules supported by Gateway API, either route selectors could be redefined in a simpler form where each selector consists of a list of names of rules and/or entire policies could be scoped for a section of a resource, by defining the `targetRef` field based on the [`PolicyTargetReferenceWithSectionName`](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2#PolicyTargetReferenceWithSectionName) type.
+
+To be noted [GEP-2649](https://github.com/kubernetes-sigs/gateway-api/pull/2813)'s recommendation of not defining inherited policies that allow for `sectionName` in the `targetRef`. Nonetheless, this is a general rule from the spec [said to be acceptable to be broken](https://github.com/kubernetes-sigs/gateway-api/pull/2813#discussion_r1511950231) in the spirit of offering better functionality to users, provided it can deal with the associated discoverability and complexity problems of this feature.
+
+## Use listMapType instead of maps of policy rules
+
+Despite having recently modified the AuthPolicy and RateLimitPolicy APIs to use maps for declaring policy rules instead of lists ([RFC 0001](https://docs.kuadrant.io/architecture/rfcs/0001-rlp-v2/)), reverting this design in future versions of these APIs, plus treating those lists as `listMapType`, could let us leverage the API server's strategic merge type to handle merges between policy objects.
+
+In the Policy CRDs, the policy rule types must specify a `name` field (required). The list of rules type (i.e. `[]Rule`) must then speficy the following [Kubebuilder CRD processing annotations](https://book.kubebuilder.io/reference/markers/crd-processing.html?highlight=listType#crd-processing):
+
+```
+// +listType=map
+// +listMapKey=name
+```
