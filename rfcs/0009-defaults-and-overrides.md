@@ -845,6 +845,24 @@ We believe policy requirement use cases can be stated and solved as an observabi
 # Unresolved questions
 [unresolved-questions]: #unresolved-questions
 
+## Merging policies with references to external objects
+
+**How to handle merges of policies from different namespaces that contain references to other objects (e.g. Secrets)?**
+
+Often policies rules include references to other Kubernetes objects, such as Secrets, typically defined in the same namespace as the policy object. When merging policies from different namespaces, these references need to be taken into account.
+
+If not carried along with the derivative resources (e.g. Authorino AuthConfig objects) that are created from a merge of policies (or from the computed effective policy), composed out of definitions from different namespaces, and that depend on those references, these references to external objects can be broken.
+
+This is not much of a problem for atomic D/O only, as the derivative objects that depend on the references could be forced to be created in the same namespace as the policy that wins against all the others – and therefore in the same namespace of the winning referents as well. However, when merging policies, we can run into a situation where final effective policies (thus also other derivative resources) contain references to objects inherited from definitions from other namespaces.
+
+Possible solutions to this problem include:
+1. Copying the referenced objects into the namespace where the derivative resources will be created.
+   - Involves maintaining (watching and reconciling) those referenced objects
+   - May raise security concerns
+2. Allowing derivative resources (e.g. Authorino AuthConfigs) to reference objects across namespaces, as well as giving permissions to the components that process those references (e.g. Authorino) to read across namespaces
+   - May raise security concerns
+   - Should probably be restricted to derivative resources created by Kuadrant and not allowed to users who create the derivative resources themselves
+
 ## Policy spec resembling more the target spec
 
 **Should Kuadrant's inherited policy specs resemble more the specs of the objects they target?**
