@@ -27,7 +27,7 @@ Enhancing the Kuadrant Inherited Policy CRDs, so the corresponding policy instan
 # Guide-level explanation
 [guide-level-explanation]: #guide-level-explanation
 
-## Conceptialization and User story
+## Conceptualization and User story
 
 The base use cases for Defaults & Overrides (D/O) are:
 - **Defaults (D):** policies declared lower in the hierarchy supersede ones set (as "defaults") at a higher level, or _"more specific beats less specific"_
@@ -234,7 +234,7 @@ In contrast, an example of trivially redundant application of D/O conditions wou
 
 ## Examples of D/O cases
 
-The following sets of examples generalize D/O applications for the presented [user stories](#conceptialization-and-user-story), regardless of details about specific personas and kinds of targeted resources. They illustrate the expected behavior for different cases involving defaults, overrides, constraints and unsetting.
+The following sets of examples generalize D/O applications for the presented [user stories](#conceptualization-and-user-story), regardless of details about specific personas and kinds of targeted resources. They illustrate the expected behavior for different cases involving defaults, overrides, constraints and unsetting.
 
 | Examples                                                                                                                                                | Highlighted user stories                           |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|
