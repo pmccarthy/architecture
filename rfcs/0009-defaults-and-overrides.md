@@ -73,14 +73,13 @@ Writing a Kuadrant policy enabled for Defaults & Overrides (D/O), to be attached
 - `overrides`: a block of _override_ policy rules with further specification of a strategy (_atomic_ set of rules or individual rules to be _merged_ into lower policies), and optional conditions for applying the overrides down through the hierarchy
 - the bare policy rules block without further qualification as a default or override set of rules – e.g. the `rules` field in a Kuadrant AuthPolicy, the `limits` field in a RateLimitPolicy.
 
-Typically, one will specify either `defaults` and/or `overrides`, or just the bare set of policy rules block without further qualification as neither defaults nor overrides.
+Between the following mutually exclusive options, either one or the other shall be used in a policy:
+1. `defaults` and/or `overrides` blocks; or
+2. the bare set of policy rules (without further qualification as neither defaults nor overrides.)
 
-In case two or more of these fields are specified, they are processed in the following order:
-1. `defaults`
-2. bare set of policy rules without qualification (treated indistinctively as another block of defaults)
-3. `overrides`
+In case the bare set of policy rules is used, it is treated implicitly as a block of defaults.
 
-Supporting specifying the bare set of policy rules at the first level of the spec, as well and simultaneously along with `defaults` and `overrides` blocks, is a strategy that aims to provide:
+Supporting specifying the bare set of policy rules at the first level of the spec, alternatively to the `defaults` and `overrides` blocks, is a strategy that aims to provide:
 1. more natural usability, especially for those who write policies attached to the lowest level of the hierarchy supported; as well as
 2. backward compatibility for policies that did not support explicit D/O and later on have moved to doing so.
 
@@ -372,10 +371,9 @@ flowchart LR
 %%{ init: { "theme": "neutral" } }%%
 flowchart LR
     merge-p1-into-p2-start([Merge policy <i>p1</i><br>into policy <i>p2</i>]) -->
-    merge-defaults-for-r[["Merge <b>defaults</b> block<br>of policy rules<br>of <i>p1</i> into <i>p2</i>"]] -->
-    merge-bare-rules-for-r[["Merge ungrouped block<br>of policy rules<br>of <i>p1</i> into <i>p2</i><br>(as <b>defaults</b>)"]] -->
-    merge-overrides-for-r[["Merge <b>overrides</b> block<br>of policy rules<br>of <i>p1</i> into <i>p2</i>"]] -->
-    merge-p1-into-p2-finish(((Return <i>p2</i>)))
+    p1-format{Explicit<br><i>defaults</i> or <i>overrides</i><br>declared in <i>p1</i>?}
+    p1-format -- Yes --> merge-defaults-for-r[["Merge <b>defaults</b> block<br>of policy rules<br>of <i>p1</i> into <i>p2</i>"]] --> merge-overrides-for-r[["Merge <b>overrides</b> block<br>of policy rules<br>of <i>p1</i> into <i>p2</i>"]] --> merge-p1-into-p2-finish(((Return <i>p2</i>)))
+    p1-format -- No --> merge-bare-rules-for-r[["Merge ungrouped<br>block of policy rules<br>of <i>p1</i> into <i>p2</i><br>(as <b>defaults</b>)"]] --> merge-p1-into-p2-finish
 ```
 
 ### Merging a generic block of policy rules (defaults or overrides) into a policy with conditions
