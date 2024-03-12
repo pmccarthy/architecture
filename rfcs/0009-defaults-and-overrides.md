@@ -319,6 +319,51 @@ The examples in this section introduce a new field `unset: []string` at the same
 
 ![A policy that tries to unset an override policy rule set a higher level](0009-defaults-and-overrides-assets/example-f2.png)
 
+## Status reporting and Policy discoverability
+
+### Possible statuses of an inherited policy
+
+An inherited policy can be at any of the following conditions ([RFC 0004](https://docs.kuadrant.io/architecture/rfcs/0004-policy-status/)):
+
+| Type     | Status | Reason                           | Message                                                                                                                                                                                                                 |
+|:--------:|:------:|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Accepted | True   | "Accepted"                       | "Policy has been accepted"                                                                                                                                                                                              |
+|          | False  | "Conflicted"                     | "Policy is conflicted by &lt;policy-ns/policy-name&gt;"                                                                                                                                                                 |
+|          | False  | "Invalid"                        | "Policy is invalid"                                                                                                                                                                                                     |
+|          | False  | "TargetNotFound"                 | "Policy target &lt;resource-name&gt; was not found"                                                                                                                                                                     |
+| Enforced | True   | "Enforced"                       | "Policy has been successfuly enforced"                                                                                                                                                                                  |
+|          | True   | "EnforcedWithAdditions"          | "Policy has been successfuly enforced. The following defaults have been added by &lt;policy-ns/policy-name&gt;: x, y"                                                                                                   |
+|          | True   | "PartiallyEnforced"              | "Policy has been successfuly enforced. The following rules have been overridden by &lt;policy-ns/policy-name&gt;: a, b"                                                                                                 |
+|          | True   | "PartiallyEnforcedWithAdditions" | "Policy has been successfuly enforced. The following rules have been overridden by &lt;policy-ns/policy-name&gt;: a, b; the following defaults have been added by &lt;policy-ns/policy-name&gt;: x, y"                  |
+|          | False  | "Overridden"                     | "Policy has been overridden by &lt;policy-ns/policy-name&gt;"                                                                                                                                                           |
+|          | False  | "Unknown"                        | "Policy has encountered some issues"                                                                                                                                                                                    |
+
+### Policy discoverability and Effective policy
+
+A special condition must be added to every object that is targeted by a Kuadrant inherited policy if the policy's `Enforced` status condition is `True`.
+
+This special condition to be added to the target object is `kuadrant.io/xPolicyAffected`, where "xPolicy" is the kind of the inherited policy (e.g. AuthPolicy, RateLimitPolicy.)
+
+The possible statuses of an object regarding its sensitivity to one or more inherited policies are:
+
+| Type            | Status | Reason              | Message                                                                                                        |
+|:---------------:|:------:|---------------------|----------------------------------------------------------------------------------------------------------------|
+| xPolicyAffected | False  | "Unaffected"        | "The object is not affected by any xPolicy"                                                                    |
+|                 | True   | "Affected"          | "The object is affected by xPolicy &lt;policy-ns/policy-name&gt;"                                              |
+|                 | True   | "PartiallyAffected" | "The following sections of the object are affected by xPolicy &lt;policy-ns/policy-name&gt;: rules.0, rules.2" |
+
+The presence of the `PolicyAffected` status condition helps identify that an object is sensitive to one of more policies of a kind, and gives some specifics about the scope of that effect (entire object or selected sections.)
+In many cases, this should be enough for inferring the actual policy rules being enforced for that object.
+
+For other cases where any of the following situations hold, a more detailed view of the final _Effective Policy_ must be provided to the user:
+- If the rules of the policy cannot be inferred by the name of the policy and/or the user lacks permission to read the policy object;
+- If the object is affected by more than one policy.
+
+To help visualize the effective policy for a given target object in that situation, at least one of the following options must be provided to the user:
+1. A read-only `EffectivePolicy` custom resource, defined for each kind of inherited policy, and with an instance created for each affected object, that is reconciled and updated by the policy controller.
+2. A HTTP endpoint of the policy controller that users can consume to read the effective policy.
+3. A CLI tool that offers a command that queries the cluster and returns the effective policy – either by leveraging any of the methods above or computing the effective policy "on-the-fly" in the same fashion as the policy controller does.
+
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
 
@@ -436,13 +481,14 @@ The path is divided in 3 tiers that could be delivered in steps, additionaly to 
 
 - Atomic defaults (currently supported; missing addition of the `defaults` field to the APIs)
 - Atomic overrides
-- Reporting of effective policy
+- Policy status and Policy discoverability (i.e. PolicyAffected status on target objects)
 - CRD labels `gateway.networking.k8s.io/policy: inherited | direct`
 
 ### Tier 2
 
 - D/O `when` conditions (and support for "constraints")
 - Merge strategy
+- Reporting of effective policy
 
 ### Tier 3
 
