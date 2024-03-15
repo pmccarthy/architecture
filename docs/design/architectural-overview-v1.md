@@ -44,9 +44,9 @@ The control plane is a set of controllers and operators that are responsible for
 * Installs and configures the Authorino data plane component.
 
 #### [Cert-Manager:](https://cert-manager.io/)
-* Manages TLS certificates for our components and for the Gateways
+* Manages TLS certificates for our components and for the Gateways. Consumes Certificate resources created by Kuadrant operator in response to the TLSPolicy.
 
-### [DNS Operator](https://github.com/Kuadrant/dns-operator)
+#### [DNS Operator](https://github.com/Kuadrant/dns-operator)
 * DNS operator consumes DNSRecord resources that are configured via the DNSPolicy api and applies them into the targeted cloud DNS provider
 AWS, Azure and Google DNS are our main targets
 
@@ -57,10 +57,10 @@ AWS, Azure and Google DNS are our main targets
 The data plane components sit in the request flow and are responsible for enforcing configuration defined by policy and providing service protection capabilities based on configuration managed and created by the control plane.
 
 #### [Limitador](https://github.com/Kuadrant/limitador)
-* Complies with the with Envoy rate limiting API to provide rate limiting to the gateway.
+* Complies with the with Envoy rate limiting API to provide rate limiting to the gateway. Consumes limits from a configmap created based on the RateLimitPolicy API.
 
 #### [Authorino](https://github.com/Kuadrant/authorino)
-* Complies with the Envoy external auth API to provide auth integration to the gateway. It provides both Authn and Authz.
+* Complies with the Envoy external auth API to provide auth integration to the gateway. It provides both Authn and Authz. Consumes AuthConfigs created by the kuadrant operator based on the defined `AuthPolicy` API.
 
 #### [WASM Shim](https://github.com/Kuadrant/wasm-shim)
 * Uses the [Proxy WASM ABI Spec](https://github.com/proxy-wasm/spec) to integrate with Envoy and provide filtering and connectivity to Limitador for request time enforcement of and rate limiting.
