@@ -46,6 +46,10 @@ The control plane is a set of controllers and operators that are responsible for
 #### [Cert-Manager:](https://cert-manager.io/)
 * Manages TLS certificates for our components and for the Gateways
 
+### [DNS Operator](https://github.com/Kuadrant/dns-operator)
+* DNS operator consumes DNSRecord resources that are configured via the DNSPolicy api and applies them into the targeted cloud DNS provider
+AWS, Azure and Google DNS are our main targets
+
 ### Data Plane Components and Responsibilities
 
 ![](./images/data-plane-overview.jpg)
