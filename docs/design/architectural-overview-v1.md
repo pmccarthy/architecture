@@ -76,7 +76,7 @@ In a single cluster, you have the Kuadrant control plane and data plane sitting 
 ### Multi-Cluster 
 
 In the default multi-cluster setup. Each individual cluster has Kuadrant installed. Each of these clusters are unaware of the other. They are effectively operating as single clusters. The multi-cluster aspect is created by sharing access with the DNS zone, using a shared host across the clusters and leveraging shared counter storage. 
-The zone is operated on independently by each of DNS operator on both clusters to form a single cohesive record set. More details on this can be found in the following RFC document: TODO add link.
+The zone is operated on independently by the DNS operator on each cluster to form a single cohesive record set. More details on this can be found in the following RFC document: TODO add link.
 The rate limit counters can also be shared and used by different clusters in order to provide global rate limiting. This is achieved by connecting each instance of Limitador to a shared data store that uses the Redis protocol. There is another option available for achieving multi-cluster connectivity (see intgrations below) that requires the use of a "hub" cluster and integration with OCM (open cluster management).
 
 ![](./images/multi-cluster-layout.jpg)
