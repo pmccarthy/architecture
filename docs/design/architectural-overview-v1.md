@@ -95,7 +95,7 @@ Shown above is a multi-cluster multi ingress gateway topology. This might be use
 
 #### Integrations
 
-#### [Open Cluster Manager](https://open-cluster-management.io/): **Optional**
+#### [Open Cluster Management](https://open-cluster-management.io/): **Optional**
 * Provides a multi-cluster control plane to enable the defining and distributing of Gateways across multiple clusters.
 
 While the default setup is to leverage a distributed configuration for DNS and rate limiting. There is also a component that offers experimental integration with Open Cluster Management. 
