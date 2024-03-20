@@ -5,7 +5,7 @@
 [AuthPolicy]: https://docs.kuadrant.io/kuadrant-operator/doc/auth/
 [RateLimitPolicy]: https://docs.kuadrant.io/kuadrant-operator/doc/rate-limiting/
 [TLSPolicy]: https://docs.kuadrant.io/kuadrant-operator/doc/tls/
-[DNSPolicy]: https://github.com/Kuadrant/multicluster-gateway-controller/blob/main/docs/reference/dnspolicy.md
+[DNSPolicy]: https://docs.kuadrant.io/kuadrant-operator/doc/reference/dnspolicy/
 
 
 ## Overview
