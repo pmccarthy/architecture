@@ -921,7 +921,7 @@ Although this proposal was thought to keep options open for multiple policies of
 
 Supporting N:1 relationships could enable use cases such as of App Developers defining D/O for each other at the same level of a shared xRoute, as well as Platform Engineers setting different policy rules on the same Gateway.
 
-This could provide an alternative to achieving separation of concerns for complex policy kinds such as the AuthPolicy, where different users could be resonsible for authentication and authorization, without necessariyl depending on defining new kinds of policies.
+This could provide an alternative to achieving separation of concerns for complex policy kinds such as the AuthPolicy, where different users could be responsible for authentication and authorization, without necessarily depending on defining new kinds of policies.
 
 ## Route rule `name` and `targetRef.sectionName`
 
