@@ -6,6 +6,7 @@
 [RateLimitPolicy]: https://docs.kuadrant.io/kuadrant-operator/doc/rate-limiting/
 [TLSPolicy]: https://docs.kuadrant.io/kuadrant-operator/doc/tls/
 [DNSPolicy]: https://docs.kuadrant.io/kuadrant-operator/doc/reference/dnspolicy/
+[KuadrantCRD]: https://github.com/Kuadrant/kuadrant-operator/blob/main/doc/reference/kuadrant.md
 
 
 ## Overview
