@@ -102,4 +102,4 @@ While the default setup is to leverage a distributed configuration for DNS and r
 
 In this setup, the OCM integration controller is installed into the HUB alongside the DNS Operator and the cert-manager. This integration allows you to define gateways in the Hub and distribute them to "spoke" clusters. The addresses of these gateways are gathered from the spokes and aggregated back to the hub. The Kuadrant operator and DNS operator then act on this information as though it were a single cluster gateway with multiple addresses. The DNS zone in the configured DNS provider is managed centrally by one DNS operator instance.
 
-![](./images/high-level-multi-clu
+![](./images/high-level-multi-cluster.png)
