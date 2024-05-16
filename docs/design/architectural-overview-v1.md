@@ -87,7 +87,7 @@ Shown above is a multi-cluster multi ingress gateway topology. This might be use
 ### Dependencies
 
 #### [Istio](https://istio.io): **Required**
-* Gateway API provider that Kuadrant integrates with via WASM and Istio APIS to provide service protection capabilities.
+* Gateway API provider that Kuadrant integrates with via WASM and Istio APIS to provide service protection capabilities. Kuadrant configures Envoy via the Istio control plane in order to enforce the applied policies and register components such as Authorino and Limitador. 
 * Used by [`RateLimitPolicy`][RateLimitPolicy] and [`AuthPolicy`][AuthPolicy]
 #### [Gateway API](https://github.com/kubernetes-sigs/gateway-api): **Required**
 * New standard for Ingress from the Kubernetes community
